@@ -4,14 +4,6 @@ env:
   VERCEL_ORG_ID: ${{ secrets.VERCEL_TEAM_ID }}
   VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
   VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-  KEY_VAULTS_SECRET: ${{ secrets.KEY_VAULTS_SECRET }}
-  DATABASE_URL: ${{ secrets.DATABASE_URL }}
-  AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
-  QSTASH_URL: ${{ secrets.QSTASH_URL }}
-  QSTASH_TOKEN: ${{ secrets.QSTASH_TOKEN }}
-  QSTASH_NEXT_SIGNING_KEY: ${{ secrets.QSTASH_NEXT_SIGNING_KEY }}
-  QSTASH_CURRENT_SIGNING_KEY: ${{ secrets.QSTASH_CURRENT_SIGNING_KEY }}
-  S3_ENDPOINT: ${{ secrets.S3_ENDPOINT }}
 
 on:
   push:
@@ -39,21 +31,6 @@ jobs:
       - name: 📦 Checkout du code
         uses: actions/checkout@v4
 
-      - name: 🔑 Vérifier les secrets Vercel
-        run: |
-          if [ -z "${{ env.VERCEL_TOKEN }}" ]; then
-            echo "::error::Le secret VERCEL_TOKEN est manquant dans les paramètres GitHub !"
-            exit 1
-          fi
-          if [ -z "${{ env.VERCEL_ORG_ID }}" ]; then
-            echo "::error::Le secret VERCEL_TEAM_ID est manquant dans les paramètres GitHub !"
-            exit 1
-          fi
-          if [ -z "${{ env.VERCEL_PROJECT_ID }}" ]; then
-            echo "::error::Le secret VERCEL_PROJECT_ID est manquant dans les paramètres GitHub !"
-            exit 1
-          fi
-
       - name: 🧹 Nettoyer le dossier .vercel résiduel
         run: rm -rf .vercel
 
@@ -72,7 +49,7 @@ jobs:
       - name: 🌍 Pull Vercel Environment Information
         run: vercel pull --yes --environment=production --token=${{ env.VERCEL_TOKEN }}
 
-      - name: 📦 Copy/patch Vercel environment variables to root
+      - name: 📦 Copy Vercel environment variables to root
         run: |
           touch .env.production.local
 
@@ -80,23 +57,10 @@ jobs:
             cp .vercel/.env.production.local .env.production.local
             echo "✅ Variables d'environnement Vercel copiées vers .env.production.local"
           else
-            echo "⚠️ Fichier .vercel/.env.production.local non trouvé, fallback GitHub Secrets uniquement"
-          fi
-
-          if [ -z "${{ env.KEY_VAULTS_SECRET }}" ]; then
-            echo "::error::Le secret GitHub KEY_VAULTS_SECRET est vide ou introuvable"
-            exit 1
-          fi
-
-          if grep -q '^KEY_VAULTS_SECRET=' .env.production.local; then
-            sed -i "s|^KEY_VAULTS_SECRET=.*$|KEY_VAULTS_SECRET=${{ env.KEY_VAULTS_SECRET }}|" .env.production.local
-          else
-            echo "KEY_VAULTS_SECRET=${{ env.KEY_VAULTS_SECRET }}" >> .env.production.local
+            echo "⚠️ Fichier .vercel/.env.production.local non trouvé"
           fi
 
       - name: 🏗️ Build Project Artifacts
-        env:
-          KEY_VAULTS_SECRET: ${{ env.KEY_VAULTS_SECRET }}
         run: vercel build --prod --token=${{ env.VERCEL_TOKEN }}
 
       - name: 🌐 Deploy Project Artifacts to Vercel
@@ -108,21 +72,6 @@ jobs:
     steps:
       - name: 📦 Checkout du code
         uses: actions/checkout@v4
-
-      - name: 🔑 Vérifier les secrets Vercel
-        run: |
-          if [ -z "${{ env.VERCEL_TOKEN }}" ]; then
-            echo "::error::Le secret VERCEL_TOKEN est manquant dans les paramètres GitHub !"
-            exit 1
-          fi
-          if [ -z "${{ env.VERCEL_ORG_ID }}" ]; then
-            echo "::error::Le secret VERCEL_TEAM_ID est manquant dans les paramètres GitHub !"
-            exit 1
-          fi
-          if [ -z "${{ env.VERCEL_PROJECT_ID }}" ]; then
-            echo "::error::Le secret VERCEL_PROJECT_ID est manquant dans les paramètres GitHub !"
-            exit 1
-          fi
 
       - name: 🧹 Nettoyer le dossier .vercel résiduel
         run: rm -rf .vercel
@@ -142,7 +91,7 @@ jobs:
       - name: 🌍 Pull Vercel Environment Information
         run: vercel pull --yes --environment=preview --token=${{ env.VERCEL_TOKEN }}
 
-      - name: 📦 Copy/patch Vercel environment variables to root
+      - name: 📦 Copy Vercel environment variables to root
         run: |
           touch .env.preview.local
 
@@ -150,23 +99,10 @@ jobs:
             cp .vercel/.env.preview.local .env.preview.local
             echo "✅ Variables d'environnement Vercel copiées vers .env.preview.local"
           else
-            echo "⚠️ Fichier .vercel/.env.preview.local non trouvé, fallback GitHub Secrets uniquement"
-          fi
-
-          if [ -z "${{ env.KEY_VAULTS_SECRET }}" ]; then
-            echo "::error::Le secret GitHub KEY_VAULTS_SECRET est vide ou introuvable"
-            exit 1
-          fi
-
-          if grep -q '^KEY_VAULTS_SECRET=' .env.preview.local; then
-            sed -i "s|^KEY_VAULTS_SECRET=.*$|KEY_VAULTS_SECRET=${{ env.KEY_VAULTS_SECRET }}|" .env.preview.local
-          else
-            echo "KEY_VAULTS_SECRET=${{ env.KEY_VAULTS_SECRET }}" >> .env.preview.local
+            echo "⚠️ Fichier .vercel/.env.preview.local non trouvé"
           fi
 
       - name: 🏗️ Build Project Artifacts
-        env:
-          KEY_VAULTS_SECRET: ${{ env.KEY_VAULTS_SECRET }}
         run: vercel build --token=${{ env.VERCEL_TOKEN }}
 
       - name: 🌐 Deploy Project Artifacts to Vercel
