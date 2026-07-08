@@ -24,6 +24,14 @@ export default function Home() {
   const [activeTab, setActiveTab] = useState<TabType>("classic");
 
   useEffect(() => {
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("/sw.js")
+        .then((reg) => console.log("Service Worker registered with scope:", reg.scope))
+        .catch((err) => console.error("Service Worker registration failed:", err));
+    }
+  }, []);
+
+  useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       // Ignore if user is typing in an input
       if (document.activeElement?.tagName === "INPUT" || document.activeElement?.tagName === "TEXTAREA") {
