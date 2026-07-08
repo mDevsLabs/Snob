@@ -43,28 +43,8 @@ jobs:
       - name: ⚡ Install Vercel CLI
         run: npm install --global vercel@latest
 
-      - name: 📥 Installation des dépendances
-        run: npm ci
-
-      - name: 🌍 Pull Vercel Environment Information
-        run: vercel pull --yes --environment=production --token=${{ env.VERCEL_TOKEN }}
-
-      - name: 📦 Copy Vercel environment variables to root
-        run: |
-          touch .env.production.local
-
-          if [ -f .vercel/.env.production.local ]; then
-            cp .vercel/.env.production.local .env.production.local
-            echo "✅ Variables d'environnement Vercel copiées vers .env.production.local"
-          else
-            echo "⚠️ Fichier .vercel/.env.production.local non trouvé"
-          fi
-
-      - name: 🏗️ Build Project Artifacts
-        run: vercel build --prod --token=${{ env.VERCEL_TOKEN }}
-
-      - name: 🌐 Deploy Project Artifacts to Vercel
-        run: vercel deploy --prebuilt --archive=tgz --prod --token=${{ env.VERCEL_TOKEN }}
+      - name: 🌐 Deploy Project to Vercel
+        run: vercel deploy --prod --token=${{ env.VERCEL_TOKEN }}
 
   Deploy-Preview:
     if: (github.event_name == 'push' && github.ref == 'refs/heads/canary') || github.event_name == 'pull_request' || (github.event_name == 'workflow_dispatch' && github.event.inputs.channel == 'preview')
