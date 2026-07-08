@@ -46,11 +46,11 @@ jobs:
             exit 1
           fi
           if [ -z "${{ env.VERCEL_ORG_ID }}" ]; then
-            echo "::error::Le secret GitHub VERCEL_TEAM_ID est manquant ou vide !"
+            echo "::error::Le secret VERCEL_TEAM_ID est manquant dans les paramètres GitHub !"
             exit 1
           fi
           if [ -z "${{ env.VERCEL_PROJECT_ID }}" ]; then
-            echo "::error::La variable VERCEL_PROJECT_ID est manquante dans le workflow !"
+            echo "::error::Le secret VERCEL_PROJECT_ID est manquant dans les paramètres GitHub !"
             exit 1
           fi
 
@@ -116,11 +116,11 @@ jobs:
             exit 1
           fi
           if [ -z "${{ env.VERCEL_ORG_ID }}" ]; then
-            echo "::error::Le secret GitHub VERCEL_TEAM_ID est manquant ou vide !"
+            echo "::error::Le secret VERCEL_TEAM_ID est manquant dans les paramètres GitHub !"
             exit 1
           fi
           if [ -z "${{ env.VERCEL_PROJECT_ID }}" ]; then
-            echo "::error::La variable VERCEL_PROJECT_ID est manquante dans le workflow !"
+            echo "::error::Le secret VERCEL_PROJECT_ID est manquant dans les paramètres GitHub !"
             exit 1
           fi
 
