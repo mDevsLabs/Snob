@@ -144,6 +144,18 @@ interface GameState {
   updateClassicHighScore: (score: number) => void;
   recordGame: (score: number, type: "classic" | "campaign" | "blitz") => void;
   buyMysteryBox: (boxType: "mystery" | "epic") => { success: boolean; loot?: LootResult; error?: string };
+  reducedMotion: boolean;
+  colorblindMode: "none" | "symbols" | "high-contrast";
+  screenShake: boolean;
+  particleDensity: "none" | "low" | "medium" | "high";
+  gridContrast: "normal" | "high";
+  aimGuide: boolean;
+  setReducedMotion: (val: boolean) => void;
+  setColorblindMode: (val: "none" | "symbols" | "high-contrast") => void;
+  setScreenShake: (val: boolean) => void;
+  setParticleDensity: (val: "none" | "low" | "medium" | "high") => void;
+  setGridContrast: (val: "normal" | "high") => void;
+  setAimGuide: (val: boolean) => void;
 }
 
 const defaultState: GameState = {
@@ -206,6 +218,18 @@ const defaultState: GameState = {
   updateClassicHighScore: () => {},
   recordGame: () => {},
   buyMysteryBox: () => ({ success: false, error: "Not implemented" }),
+  reducedMotion: false,
+  colorblindMode: "none",
+  screenShake: true,
+  particleDensity: "high",
+  gridContrast: "normal",
+  aimGuide: true,
+  setReducedMotion: () => {},
+  setColorblindMode: () => {},
+  setScreenShake: () => {},
+  setParticleDensity: () => {},
+  setGridContrast: () => {},
+  setAimGuide: () => {},
 };
 
 const GameContext = createContext<GameState>(defaultState);
@@ -361,6 +385,12 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         claimedSnobPassTiers: parsed.claimedSnobPassTiers || [],
         dailyRewardClaimed: dailyRewardClaimed,
         lastDailyRewardClaim: parsed.lastDailyRewardClaim || null,
+        reducedMotion: parsed.reducedMotion ?? false,
+        colorblindMode: parsed.colorblindMode ?? "none",
+        screenShake: parsed.screenShake ?? true,
+        particleDensity: parsed.particleDensity ?? "high",
+        gridContrast: parsed.gridContrast ?? "normal",
+        aimGuide: parsed.aimGuide ?? true,
       });
       setIsLoaded(true);
     }, 0);
@@ -392,7 +422,13 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         claimedSnobPassTiers: state.claimedSnobPassTiers,
         dailyRewardClaimed: state.dailyRewardClaimed,
         lastQuestResetDate: startOfDay(new Date()).toISOString(),
-        lastDailyRewardClaim: state.lastDailyRewardClaim
+        lastDailyRewardClaim: state.lastDailyRewardClaim,
+        reducedMotion: state.reducedMotion,
+        colorblindMode: state.colorblindMode,
+        screenShake: state.screenShake,
+        particleDensity: state.particleDensity,
+        gridContrast: state.gridContrast,
+        aimGuide: state.aimGuide,
       }));
     }
   }, [state, isLoaded]);
@@ -1045,6 +1081,18 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         registerWithEmail,
         logout,
         dismissLevelUpReward: () => setState((s) => ({ ...s, levelUpReward: null })),
+        reducedMotion: state.reducedMotion ?? false,
+        colorblindMode: state.colorblindMode ?? "none",
+        screenShake: state.screenShake ?? true,
+        particleDensity: state.particleDensity ?? "high",
+        gridContrast: state.gridContrast ?? "normal",
+        aimGuide: state.aimGuide ?? true,
+        setReducedMotion: (val: boolean) => setState((s) => ({ ...s, reducedMotion: val })),
+        setColorblindMode: (val: "none" | "symbols" | "high-contrast") => setState((s) => ({ ...s, colorblindMode: val })),
+        setScreenShake: (val: boolean) => setState((s) => ({ ...s, screenShake: val })),
+        setParticleDensity: (val: "none" | "low" | "medium" | "high") => setState((s) => ({ ...s, particleDensity: val })),
+        setGridContrast: (val: "normal" | "high") => setState((s) => ({ ...s, gridContrast: val })),
+        setAimGuide: (val: boolean) => setState((s) => ({ ...s, aimGuide: val })),
       }}
     >
       {children}

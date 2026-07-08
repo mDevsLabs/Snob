@@ -300,6 +300,22 @@ export const useBlockBlast = () => {
     }
   }, [grid, holdShape, gameOver, checkGameOver]);
 
+  const destroyCell = useCallback((r: number, c: number) => {
+    if (r < 0 || r >= GRID_SIZE || c < 0 || c >= GRID_SIZE || grid[r][c] === 0) return false;
+    
+    const newGrid = grid.map(row => [...row]);
+    newGrid[r][c] = 0;
+    setGrid(newGrid);
+    
+    // Si c'était game over, on réévalue
+    if (gameOver) {
+      if (!checkGameOver(newGrid, hand, holdShape)) {
+        setGameOver(false);
+      }
+    }
+    return true;
+  }, [grid, gameOver, hand, holdShape, checkGameOver]);
+
   const reset = useCallback(() => {
     setGrid(getEmptyGrid());
     setHand(getRandomShapes());
@@ -322,6 +338,7 @@ export const useBlockBlast = () => {
     holdCurrentShape,
     rotateHoldShape,
     rerollHand,
-    rerollsUsed
+    rerollsUsed,
+    destroyCell
   };
 };

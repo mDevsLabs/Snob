@@ -10,6 +10,7 @@ import Classic from "@/components/Classic";
 import Store from "@/components/Store";
 import Inventory from "@/components/Inventory";
 import SnobPass from "@/components/SnobPass";
+import Settings from "@/components/Settings";
 import LevelUpAlert from "@/components/LevelUpAlert";
 import AuthModal from "@/components/AuthModal";
 import AuthPrompt from "@/components/AuthPrompt";
@@ -60,6 +61,9 @@ export default function Home() {
         case 'a':
           setActiveTab("campaign");
           break;
+        case 'g':
+          setActiveTab("settings");
+          break;
       }
     };
 
@@ -83,6 +87,7 @@ export default function Home() {
             {activeTab === "inventory" && <Inventory />}
             {activeTab === "shop" && <Store />}
             {activeTab === "snob-pass" && <SnobPass />}
+            {activeTab === "settings" && <Settings />}
           </main>
 
           <DailyLogin />
