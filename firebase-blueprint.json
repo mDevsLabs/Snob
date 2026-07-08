@@ -1,0 +1,31 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "User profile and game state",
+      "type": "object",
+      "properties": {
+        "coins": { "type": "number" },
+        "xp": { "type": "number" },
+        "level": { "type": "number" },
+        "prestige": { "type": "number" },
+        "streak": { "type": "number" },
+        "lastLoginDate": { "type": "string" },
+        "soundEnabled": { "type": "boolean" },
+        "classicHighScore": { "type": "number" },
+        "inventory": { "type": "array" },
+        "equippedSkin": { "type": "string" },
+        "equippedTrail": { "type": "string" },
+        "username": { "type": "string" },
+        "bio": { "type": "string" },
+        "avatar": { "type": "string" }
+      }
+    }
+  },
+  "firestore": {
+    "users/{userId}": {
+      "schema": { "$ref": "#/entities/UserProfile" },
+      "description": "User profiles"
+    }
+  }
+}

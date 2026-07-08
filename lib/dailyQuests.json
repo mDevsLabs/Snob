@@ -1,0 +1,1602 @@
+[
+  {
+    "type": "blitz_played",
+    "target": 2,
+    "description": "Jouer 2 parties Blitz",
+    "rewardCoins": 70,
+    "rewardXp": 200,
+    "isWeekly": false
+  },
+  {
+    "type": "score",
+    "target": 4000,
+    "description": "Atteindre 4,000 points en une partie",
+    "rewardCoins": 80,
+    "rewardXp": 280,
+    "isWeekly": false
+  },
+  {
+    "type": "doubles",
+    "target": 5,
+    "description": "Réaliser 5 double lignes (2 lignes d'un coup)",
+    "rewardCoins": 90,
+    "rewardXp": 350,
+    "isWeekly": false
+  },
+  {
+    "type": "lines",
+    "target": 30,
+    "description": "Détruire 30 lignes au total",
+    "rewardCoins": 60,
+    "rewardXp": 210,
+    "isWeekly": false
+  },
+  {
+    "type": "blitz_played",
+    "target": 2,
+    "description": "Jouer 2 parties Blitz",
+    "rewardCoins": 70,
+    "rewardXp": 200,
+    "isWeekly": false
+  },
+  {
+    "type": "score",
+    "target": 8000,
+    "description": "Atteindre 8,000 points en une partie",
+    "rewardCoins": 65,
+    "rewardXp": 240,
+    "isWeekly": false
+  },
+  {
+    "type": "doubles",
+    "target": 3,
+    "description": "Réaliser 3 double lignes (2 lignes d'un coup)",
+    "rewardCoins": 70,
+    "rewardXp": 270,
+    "isWeekly": false
+  },
+  {
+    "type": "lines",
+    "target": 50,
+    "description": "Détruire 50 lignes au total",
+    "rewardCoins": 50,
+    "rewardXp": 180,
+    "isWeekly": false
+  },
+  {
+    "type": "blitz_played",
+    "target": 2,
+    "description": "Jouer 2 parties Blitz",
+    "rewardCoins": 70,
+    "rewardXp": 200,
+    "isWeekly": false
+  },
+  {
+    "type": "score",
+    "target": 12000,
+    "description": "Atteindre 12,000 points en une partie",
+    "rewardCoins": 50,
+    "rewardXp": 200,
+    "isWeekly": false
+  },
+  {
+    "type": "doubles",
+    "target": 7,
+    "description": "Réaliser 7 double lignes (2 lignes d'un coup)",
+    "rewardCoins": 110,
+    "rewardXp": 430,
+    "isWeekly": false
+  },
+  {
+    "type": "lines",
+    "target": 20,
+    "description": "Détruire 20 lignes au total",
+    "rewardCoins": 100,
+    "rewardXp": 330,
+    "isWeekly": false
+  },
+  {
+    "type": "blitz_played",
+    "target": 2,
+    "description": "Jouer 2 parties Blitz",
+    "rewardCoins": 70,
+    "rewardXp": 200,
+    "isWeekly": false
+  },
+  {
+    "type": "score",
+    "target": 16000,
+    "description": "Atteindre 16,000 points en une partie",
+    "rewardCoins": 110,
+    "rewardXp": 360,
+    "isWeekly": false
+  },
+  {
+    "type": "doubles",
+    "target": 5,
+    "description": "Réaliser 5 double lignes (2 lignes d'un coup)",
+    "rewardCoins": 90,
+    "rewardXp": 350,
+    "isWeekly": false
+  },
+  {
+    "type": "lines",
+    "target": 40,
+    "description": "Détruire 40 lignes au total",
+    "rewardCoins": 90,
+    "rewardXp": 300,
+    "isWeekly": false
+  },
+  {
+    "type": "blitz_played",
+    "target": 2,
+    "description": "Jouer 2 parties Blitz",
+    "rewardCoins": 70,
+    "rewardXp": 200,
+    "isWeekly": false
+  },
+  {
+    "type": "score",
+    "target": 5000,
+    "description": "Atteindre 5,000 points en une partie",
+    "rewardCoins": 95,
+    "rewardXp": 320,
+    "isWeekly": false
+  },
+  {
+    "type": "doubles",
+    "target": 3,
+    "description": "Réaliser 3 double lignes (2 lignes d'un coup)",
+    "rewardCoins": 70,
+    "rewardXp": 270,
+    "isWeekly": false
+  },
+  {
+    "type": "lines",
+    "target": 10,
+    "description": "Détruire 10 lignes au total",
+    "rewardCoins": 70,
+    "rewardXp": 240,
+    "isWeekly": false
+  },
+  {
+    "type": "blitz_played",
+    "target": 2,
+    "description": "Jouer 2 parties Blitz",
+    "rewardCoins": 70,
+    "rewardXp": 200,
+    "isWeekly": false
+  },
+  {
+    "type": "score",
+    "target": 9000,
+    "description": "Atteindre 9,000 points en une partie",
+    "rewardCoins": 80,
+    "rewardXp": 280,
+    "isWeekly": false
+  },
+  {
+    "type": "doubles",
+    "target": 7,
+    "description": "Réaliser 7 double lignes (2 lignes d'un coup)",
+    "rewardCoins": 110,
+    "rewardXp": 430,
+    "isWeekly": false
+  },
+  {
+    "type": "lines",
+    "target": 30,
+    "description": "Détruire 30 lignes au total",
+    "rewardCoins": 60,
+    "rewardXp": 210,
+    "isWeekly": false
+  },
+  {
+    "type": "blitz_played",
+    "target": 2,
+    "description": "Jouer 2 parties Blitz",
+    "rewardCoins": 70,
+    "rewardXp": 200,
+    "isWeekly": false
+  },
+  {
+    "type": "score",
+    "target": 13000,
+    "description": "Atteindre 13,000 points en une partie",
+    "rewardCoins": 65,
+    "rewardXp": 240,
+    "isWeekly": false
+  },
+  {
+    "type": "doubles",
+    "target": 5,
+    "description": "Réaliser 5 double lignes (2 lignes d'un coup)",
+    "rewardCoins": 90,
+    "rewardXp": 350,
+    "isWeekly": false
+  },
+  {
+    "type": "lines",
+    "target": 50,
+    "description": "Détruire 50 lignes au total",
+    "rewardCoins": 50,
+    "rewardXp": 180,
+    "isWeekly": false
+  },
+  {
+    "type": "blitz_played",
+    "target": 2,
+    "description": "Jouer 2 parties Blitz",
+    "rewardCoins": 70,
+    "rewardXp": 200,
+    "isWeekly": false
+  },
+  {
+    "type": "score",
+    "target": 2000,
+    "description": "Atteindre 2,000 points en une partie",
+    "rewardCoins": 50,
+    "rewardXp": 200,
+    "isWeekly": false
+  },
+  {
+    "type": "doubles",
+    "target": 3,
+    "description": "Réaliser 3 double lignes (2 lignes d'un coup)",
+    "rewardCoins": 70,
+    "rewardXp": 270,
+    "isWeekly": false
+  },
+  {
+    "type": "lines",
+    "target": 20,
+    "description": "Détruire 20 lignes au total",
+    "rewardCoins": 100,
+    "rewardXp": 330,
+    "isWeekly": false
+  },
+  {
+    "type": "blitz_played",
+    "target": 2,
+    "description": "Jouer 2 parties Blitz",
+    "rewardCoins": 70,
+    "rewardXp": 200,
+    "isWeekly": false
+  },
+  {
+    "type": "score",
+    "target": 6000,
+    "description": "Atteindre 6,000 points en une partie",
+    "rewardCoins": 110,
+    "rewardXp": 360,
+    "isWeekly": false
+  },
+  {
+    "type": "doubles",
+    "target": 7,
+    "description": "Réaliser 7 double lignes (2 lignes d'un coup)",
+    "rewardCoins": 110,
+    "rewardXp": 430,
+    "isWeekly": false
+  },
+  {
+    "type": "lines",
+    "target": 40,
+    "description": "Détruire 40 lignes au total",
+    "rewardCoins": 90,
+    "rewardXp": 300,
+    "isWeekly": false
+  },
+  {
+    "type": "blitz_played",
+    "target": 2,
+    "description": "Jouer 2 parties Blitz",
+    "rewardCoins": 70,
+    "rewardXp": 200,
+    "isWeekly": false
+  },
+  {
+    "type": "score",
+    "target": 10000,
+    "description": "Atteindre 10,000 points en une partie",
+    "rewardCoins": 95,
+    "rewardXp": 320,
+    "isWeekly": false
+  },
+  {
+    "type": "doubles",
+    "target": 5,
+    "description": "Réaliser 5 double lignes (2 lignes d'un coup)",
+    "rewardCoins": 90,
+    "rewardXp": 350,
+    "isWeekly": false
+  },
+  {
+    "type": "lines",
+    "target": 10,
+    "description": "Détruire 10 lignes au total",
+    "rewardCoins": 70,
+    "rewardXp": 240,
+    "isWeekly": false
+  },
+  {
+    "type": "blitz_played",
+    "target": 2,
+    "description": "Jouer 2 parties Blitz",
+    "rewardCoins": 70,
+    "rewardXp": 200,
+    "isWeekly": false
+  },
+  {
+    "type": "score",
+    "target": 14000,
+    "description": "Atteindre 14,000 points en une partie",
+    "rewardCoins": 80,
+    "rewardXp": 280,
+    "isWeekly": false
+  },
+  {
+    "type": "doubles",
+    "target": 3,
+    "description": "Réaliser 3 double lignes (2 lignes d'un coup)",
+    "rewardCoins": 70,
+    "rewardXp": 270,
+    "isWeekly": false
+  },
+  {
+    "type": "lines",
+    "target": 30,
+    "description": "Détruire 30 lignes au total",
+    "rewardCoins": 60,
+    "rewardXp": 210,
+    "isWeekly": false
+  },
+  {
+    "type": "blitz_played",
+    "target": 2,
+    "description": "Jouer 2 parties Blitz",
+    "rewardCoins": 70,
+    "rewardXp": 200,
+    "isWeekly": false
+  },
+  {
+    "type": "score",
+    "target": 3000,
+    "description": "Atteindre 3,000 points en une partie",
+    "rewardCoins": 65,
+    "rewardXp": 240,
+    "isWeekly": false
+  },
+  {
+    "type": "doubles",
+    "target": 7,
+    "description": "Réaliser 7 double lignes (2 lignes d'un coup)",
+    "rewardCoins": 110,
+    "rewardXp": 430,
+    "isWeekly": false
+  },
+  {
+    "type": "lines",
+    "target": 50,
+    "description": "Détruire 50 lignes au total",
+    "rewardCoins": 50,
+    "rewardXp": 180,
+    "isWeekly": false
+  },
+  {
+    "type": "blitz_played",
+    "target": 2,
+    "description": "Jouer 2 parties Blitz",
+    "rewardCoins": 70,
+    "rewardXp": 200,
+    "isWeekly": false
+  },
+  {
+    "type": "score",
+    "target": 7000,
+    "description": "Atteindre 7,000 points en une partie",
+    "rewardCoins": 50,
+    "rewardXp": 200,
+    "isWeekly": false
+  },
+  {
+    "type": "doubles",
+    "target": 5,
+    "description": "Réaliser 5 double lignes (2 lignes d'un coup)",
+    "rewardCoins": 90,
+    "rewardXp": 350,
+    "isWeekly": false
+  },
+  {
+    "type": "lines",
+    "target": 20,
+    "description": "Détruire 20 lignes au total",
+    "rewardCoins": 100,
+    "rewardXp": 330,
+    "isWeekly": false
+  },
+  {
+    "type": "blitz_played",
+    "target": 2,
+    "description": "Jouer 2 parties Blitz",
+    "rewardCoins": 70,
+    "rewardXp": 200,
+    "isWeekly": false
+  },
+  {
+    "type": "score",
+    "target": 11000,
+    "description": "Atteindre 11,000 points en une partie",
+    "rewardCoins": 110,
+    "rewardXp": 360,
+    "isWeekly": false
+  },
+  {
+    "type": "doubles",
+    "target": 3,
+    "description": "Réaliser 3 double lignes (2 lignes d'un coup)",
+    "rewardCoins": 70,
+    "rewardXp": 270,
+    "isWeekly": false
+  },
+  {
+    "type": "lines",
+    "target": 40,
+    "description": "Détruire 40 lignes au total",
+    "rewardCoins": 90,
+    "rewardXp": 300,
+    "isWeekly": false
+  },
+  {
+    "type": "blitz_played",
+    "target": 2,
+    "description": "Jouer 2 parties Blitz",
+    "rewardCoins": 70,
+    "rewardXp": 200,
+    "isWeekly": false
+  },
+  {
+    "type": "score",
+    "target": 15000,
+    "description": "Atteindre 15,000 points en une partie",
+    "rewardCoins": 95,
+    "rewardXp": 320,
+    "isWeekly": false
+  },
+  {
+    "type": "doubles",
+    "target": 7,
+    "description": "Réaliser 7 double lignes (2 lignes d'un coup)",
+    "rewardCoins": 110,
+    "rewardXp": 430,
+    "isWeekly": false
+  },
+  {
+    "type": "lines",
+    "target": 10,
+    "description": "Détruire 10 lignes au total",
+    "rewardCoins": 70,
+    "rewardXp": 240,
+    "isWeekly": false
+  },
+  {
+    "type": "blitz_played",
+    "target": 2,
+    "description": "Jouer 2 parties Blitz",
+    "rewardCoins": 70,
+    "rewardXp": 200,
+    "isWeekly": false
+  },
+  {
+    "type": "score",
+    "target": 4000,
+    "description": "Atteindre 4,000 points en une partie",
+    "rewardCoins": 80,
+    "rewardXp": 280,
+    "isWeekly": false
+  },
+  {
+    "type": "doubles",
+    "target": 5,
+    "description": "Réaliser 5 double lignes (2 lignes d'un coup)",
+    "rewardCoins": 90,
+    "rewardXp": 350,
+    "isWeekly": false
+  },
+  {
+    "type": "lines",
+    "target": 30,
+    "description": "Détruire 30 lignes au total",
+    "rewardCoins": 60,
+    "rewardXp": 210,
+    "isWeekly": false
+  },
+  {
+    "type": "blitz_played",
+    "target": 2,
+    "description": "Jouer 2 parties Blitz",
+    "rewardCoins": 70,
+    "rewardXp": 200,
+    "isWeekly": false
+  },
+  {
+    "type": "score",
+    "target": 8000,
+    "description": "Atteindre 8,000 points en une partie",
+    "rewardCoins": 65,
+    "rewardXp": 240,
+    "isWeekly": false
+  },
+  {
+    "type": "doubles",
+    "target": 3,
+    "description": "Réaliser 3 double lignes (2 lignes d'un coup)",
+    "rewardCoins": 70,
+    "rewardXp": 270,
+    "isWeekly": false
+  },
+  {
+    "type": "lines",
+    "target": 50,
+    "description": "Détruire 50 lignes au total",
+    "rewardCoins": 50,
+    "rewardXp": 180,
+    "isWeekly": false
+  },
+  {
+    "type": "blitz_played",
+    "target": 2,
+    "description": "Jouer 2 parties Blitz",
+    "rewardCoins": 70,
+    "rewardXp": 200,
+    "isWeekly": false
+  },
+  {
+    "type": "score",
+    "target": 12000,
+    "description": "Atteindre 12,000 points en une partie",
+    "rewardCoins": 50,
+    "rewardXp": 200,
+    "isWeekly": false
+  },
+  {
+    "type": "doubles",
+    "target": 7,
+    "description": "Réaliser 7 double lignes (2 lignes d'un coup)",
+    "rewardCoins": 110,
+    "rewardXp": 430,
+    "isWeekly": false
+  },
+  {
+    "type": "lines",
+    "target": 20,
+    "description": "Détruire 20 lignes au total",
+    "rewardCoins": 100,
+    "rewardXp": 330,
+    "isWeekly": false
+  },
+  {
+    "type": "blitz_played",
+    "target": 2,
+    "description": "Jouer 2 parties Blitz",
+    "rewardCoins": 70,
+    "rewardXp": 200,
+    "isWeekly": false
+  },
+  {
+    "type": "score",
+    "target": 16000,
+    "description": "Atteindre 16,000 points en une partie",
+    "rewardCoins": 110,
+    "rewardXp": 360,
+    "isWeekly": false
+  },
+  {
+    "type": "doubles",
+    "target": 5,
+    "description": "Réaliser 5 double lignes (2 lignes d'un coup)",
+    "rewardCoins": 90,
+    "rewardXp": 350,
+    "isWeekly": false
+  },
+  {
+    "type": "lines",
+    "target": 40,
+    "description": "Détruire 40 lignes au total",
+    "rewardCoins": 90,
+    "rewardXp": 300,
+    "isWeekly": false
+  },
+  {
+    "type": "blitz_played",
+    "target": 2,
+    "description": "Jouer 2 parties Blitz",
+    "rewardCoins": 70,
+    "rewardXp": 200,
+    "isWeekly": false
+  },
+  {
+    "type": "score",
+    "target": 5000,
+    "description": "Atteindre 5,000 points en une partie",
+    "rewardCoins": 95,
+    "rewardXp": 320,
+    "isWeekly": false
+  },
+  {
+    "type": "doubles",
+    "target": 3,
+    "description": "Réaliser 3 double lignes (2 lignes d'un coup)",
+    "rewardCoins": 70,
+    "rewardXp": 270,
+    "isWeekly": false
+  },
+  {
+    "type": "lines",
+    "target": 10,
+    "description": "Détruire 10 lignes au total",
+    "rewardCoins": 70,
+    "rewardXp": 240,
+    "isWeekly": false
+  },
+  {
+    "type": "blitz_played",
+    "target": 2,
+    "description": "Jouer 2 parties Blitz",
+    "rewardCoins": 70,
+    "rewardXp": 200,
+    "isWeekly": false
+  },
+  {
+    "type": "score",
+    "target": 9000,
+    "description": "Atteindre 9,000 points en une partie",
+    "rewardCoins": 80,
+    "rewardXp": 280,
+    "isWeekly": false
+  },
+  {
+    "type": "doubles",
+    "target": 7,
+    "description": "Réaliser 7 double lignes (2 lignes d'un coup)",
+    "rewardCoins": 110,
+    "rewardXp": 430,
+    "isWeekly": false
+  },
+  {
+    "type": "lines",
+    "target": 30,
+    "description": "Détruire 30 lignes au total",
+    "rewardCoins": 60,
+    "rewardXp": 210,
+    "isWeekly": false
+  },
+  {
+    "type": "blitz_played",
+    "target": 2,
+    "description": "Jouer 2 parties Blitz",
+    "rewardCoins": 70,
+    "rewardXp": 200,
+    "isWeekly": false
+  },
+  {
+    "type": "score",
+    "target": 13000,
+    "description": "Atteindre 13,000 points en une partie",
+    "rewardCoins": 65,
+    "rewardXp": 240,
+    "isWeekly": false
+  },
+  {
+    "type": "doubles",
+    "target": 5,
+    "description": "Réaliser 5 double lignes (2 lignes d'un coup)",
+    "rewardCoins": 90,
+    "rewardXp": 350,
+    "isWeekly": false
+  },
+  {
+    "type": "lines",
+    "target": 50,
+    "description": "Détruire 50 lignes au total",
+    "rewardCoins": 50,
+    "rewardXp": 180,
+    "isWeekly": false
+  },
+  {
+    "type": "blitz_played",
+    "target": 2,
+    "description": "Jouer 2 parties Blitz",
+    "rewardCoins": 70,
+    "rewardXp": 200,
+    "isWeekly": false
+  },
+  {
+    "type": "score",
+    "target": 2000,
+    "description": "Atteindre 2,000 points en une partie",
+    "rewardCoins": 50,
+    "rewardXp": 200,
+    "isWeekly": false
+  },
+  {
+    "type": "doubles",
+    "target": 3,
+    "description": "Réaliser 3 double lignes (2 lignes d'un coup)",
+    "rewardCoins": 70,
+    "rewardXp": 270,
+    "isWeekly": false
+  },
+  {
+    "type": "lines",
+    "target": 20,
+    "description": "Détruire 20 lignes au total",
+    "rewardCoins": 100,
+    "rewardXp": 330,
+    "isWeekly": false
+  },
+  {
+    "type": "blitz_played",
+    "target": 2,
+    "description": "Jouer 2 parties Blitz",
+    "rewardCoins": 70,
+    "rewardXp": 200,
+    "isWeekly": false
+  },
+  {
+    "type": "score",
+    "target": 6000,
+    "description": "Atteindre 6,000 points en une partie",
+    "rewardCoins": 110,
+    "rewardXp": 360,
+    "isWeekly": false
+  },
+  {
+    "type": "doubles",
+    "target": 7,
+    "description": "Réaliser 7 double lignes (2 lignes d'un coup)",
+    "rewardCoins": 110,
+    "rewardXp": 430,
+    "isWeekly": false
+  },
+  {
+    "type": "lines",
+    "target": 40,
+    "description": "Détruire 40 lignes au total",
+    "rewardCoins": 90,
+    "rewardXp": 300,
+    "isWeekly": false
+  },
+  {
+    "type": "blitz_played",
+    "target": 2,
+    "description": "Jouer 2 parties Blitz",
+    "rewardCoins": 70,
+    "rewardXp": 200,
+    "isWeekly": false
+  },
+  {
+    "type": "score",
+    "target": 10000,
+    "description": "Atteindre 10,000 points en une partie",
+    "rewardCoins": 95,
+    "rewardXp": 320,
+    "isWeekly": false
+  },
+  {
+    "type": "doubles",
+    "target": 5,
+    "description": "Réaliser 5 double lignes (2 lignes d'un coup)",
+    "rewardCoins": 90,
+    "rewardXp": 350,
+    "isWeekly": false
+  },
+  {
+    "type": "lines",
+    "target": 10,
+    "description": "Détruire 10 lignes au total",
+    "rewardCoins": 70,
+    "rewardXp": 240,
+    "isWeekly": false
+  },
+  {
+    "type": "blitz_played",
+    "target": 2,
+    "description": "Jouer 2 parties Blitz",
+    "rewardCoins": 70,
+    "rewardXp": 200,
+    "isWeekly": false
+  },
+  {
+    "type": "score",
+    "target": 14000,
+    "description": "Atteindre 14,000 points en une partie",
+    "rewardCoins": 80,
+    "rewardXp": 280,
+    "isWeekly": false
+  },
+  {
+    "type": "doubles",
+    "target": 3,
+    "description": "Réaliser 3 double lignes (2 lignes d'un coup)",
+    "rewardCoins": 70,
+    "rewardXp": 270,
+    "isWeekly": false
+  },
+  {
+    "type": "lines",
+    "target": 30,
+    "description": "Détruire 30 lignes au total",
+    "rewardCoins": 60,
+    "rewardXp": 210,
+    "isWeekly": false
+  },
+  {
+    "type": "blitz_played",
+    "target": 2,
+    "description": "Jouer 2 parties Blitz",
+    "rewardCoins": 70,
+    "rewardXp": 200,
+    "isWeekly": false
+  },
+  {
+    "type": "score",
+    "target": 3000,
+    "description": "Atteindre 3,000 points en une partie",
+    "rewardCoins": 65,
+    "rewardXp": 240,
+    "isWeekly": false
+  },
+  {
+    "type": "doubles",
+    "target": 7,
+    "description": "Réaliser 7 double lignes (2 lignes d'un coup)",
+    "rewardCoins": 110,
+    "rewardXp": 430,
+    "isWeekly": false
+  },
+  {
+    "type": "lines",
+    "target": 50,
+    "description": "Détruire 50 lignes au total",
+    "rewardCoins": 50,
+    "rewardXp": 180,
+    "isWeekly": false
+  },
+  {
+    "type": "blitz_played",
+    "target": 2,
+    "description": "Jouer 2 parties Blitz",
+    "rewardCoins": 70,
+    "rewardXp": 200,
+    "isWeekly": false
+  },
+  {
+    "type": "score",
+    "target": 7000,
+    "description": "Atteindre 7,000 points en une partie",
+    "rewardCoins": 50,
+    "rewardXp": 200,
+    "isWeekly": false
+  },
+  {
+    "type": "doubles",
+    "target": 5,
+    "description": "Réaliser 5 double lignes (2 lignes d'un coup)",
+    "rewardCoins": 90,
+    "rewardXp": 350,
+    "isWeekly": false
+  },
+  {
+    "type": "lines",
+    "target": 20,
+    "description": "Détruire 20 lignes au total",
+    "rewardCoins": 100,
+    "rewardXp": 330,
+    "isWeekly": false
+  },
+  {
+    "type": "blitz_played",
+    "target": 2,
+    "description": "Jouer 2 parties Blitz",
+    "rewardCoins": 70,
+    "rewardXp": 200,
+    "isWeekly": false
+  },
+  {
+    "type": "score",
+    "target": 11000,
+    "description": "Atteindre 11,000 points en une partie",
+    "rewardCoins": 110,
+    "rewardXp": 360,
+    "isWeekly": false
+  },
+  {
+    "type": "doubles",
+    "target": 3,
+    "description": "Réaliser 3 double lignes (2 lignes d'un coup)",
+    "rewardCoins": 70,
+    "rewardXp": 270,
+    "isWeekly": false
+  },
+  {
+    "type": "lines",
+    "target": 40,
+    "description": "Détruire 40 lignes au total",
+    "rewardCoins": 90,
+    "rewardXp": 300,
+    "isWeekly": false
+  },
+  {
+    "type": "blitz_played",
+    "target": 2,
+    "description": "Jouer 2 parties Blitz",
+    "rewardCoins": 70,
+    "rewardXp": 200,
+    "isWeekly": false
+  },
+  {
+    "type": "score",
+    "target": 15000,
+    "description": "Atteindre 15,000 points en une partie",
+    "rewardCoins": 95,
+    "rewardXp": 320,
+    "isWeekly": false
+  },
+  {
+    "type": "doubles",
+    "target": 7,
+    "description": "Réaliser 7 double lignes (2 lignes d'un coup)",
+    "rewardCoins": 110,
+    "rewardXp": 430,
+    "isWeekly": false
+  },
+  {
+    "type": "lines",
+    "target": 10,
+    "description": "Détruire 10 lignes au total",
+    "rewardCoins": 70,
+    "rewardXp": 240,
+    "isWeekly": false
+  },
+  {
+    "type": "blitz_played",
+    "target": 2,
+    "description": "Jouer 2 parties Blitz",
+    "rewardCoins": 70,
+    "rewardXp": 200,
+    "isWeekly": false
+  },
+  {
+    "type": "score",
+    "target": 4000,
+    "description": "Atteindre 4,000 points en une partie",
+    "rewardCoins": 80,
+    "rewardXp": 280,
+    "isWeekly": false
+  },
+  {
+    "type": "doubles",
+    "target": 5,
+    "description": "Réaliser 5 double lignes (2 lignes d'un coup)",
+    "rewardCoins": 90,
+    "rewardXp": 350,
+    "isWeekly": false
+  },
+  {
+    "type": "lines",
+    "target": 30,
+    "description": "Détruire 30 lignes au total",
+    "rewardCoins": 60,
+    "rewardXp": 210,
+    "isWeekly": false
+  },
+  {
+    "type": "blitz_played",
+    "target": 2,
+    "description": "Jouer 2 parties Blitz",
+    "rewardCoins": 70,
+    "rewardXp": 200,
+    "isWeekly": false
+  },
+  {
+    "type": "score",
+    "target": 8000,
+    "description": "Atteindre 8,000 points en une partie",
+    "rewardCoins": 65,
+    "rewardXp": 240,
+    "isWeekly": false
+  },
+  {
+    "type": "doubles",
+    "target": 3,
+    "description": "Réaliser 3 double lignes (2 lignes d'un coup)",
+    "rewardCoins": 70,
+    "rewardXp": 270,
+    "isWeekly": false
+  },
+  {
+    "type": "lines",
+    "target": 50,
+    "description": "Détruire 50 lignes au total",
+    "rewardCoins": 50,
+    "rewardXp": 180,
+    "isWeekly": false
+  },
+  {
+    "type": "blitz_played",
+    "target": 2,
+    "description": "Jouer 2 parties Blitz",
+    "rewardCoins": 70,
+    "rewardXp": 200,
+    "isWeekly": false
+  },
+  {
+    "type": "score",
+    "target": 12000,
+    "description": "Atteindre 12,000 points en une partie",
+    "rewardCoins": 50,
+    "rewardXp": 200,
+    "isWeekly": false
+  },
+  {
+    "type": "doubles",
+    "target": 7,
+    "description": "Réaliser 7 double lignes (2 lignes d'un coup)",
+    "rewardCoins": 110,
+    "rewardXp": 430,
+    "isWeekly": false
+  },
+  {
+    "type": "lines",
+    "target": 20,
+    "description": "Détruire 20 lignes au total",
+    "rewardCoins": 100,
+    "rewardXp": 330,
+    "isWeekly": false
+  },
+  {
+    "type": "blitz_played",
+    "target": 2,
+    "description": "Jouer 2 parties Blitz",
+    "rewardCoins": 70,
+    "rewardXp": 200,
+    "isWeekly": false
+  },
+  {
+    "type": "score",
+    "target": 16000,
+    "description": "Atteindre 16,000 points en une partie",
+    "rewardCoins": 110,
+    "rewardXp": 360,
+    "isWeekly": false
+  },
+  {
+    "type": "doubles",
+    "target": 5,
+    "description": "Réaliser 5 double lignes (2 lignes d'un coup)",
+    "rewardCoins": 90,
+    "rewardXp": 350,
+    "isWeekly": false
+  },
+  {
+    "type": "lines",
+    "target": 40,
+    "description": "Détruire 40 lignes au total",
+    "rewardCoins": 90,
+    "rewardXp": 300,
+    "isWeekly": false
+  },
+  {
+    "type": "blitz_played",
+    "target": 2,
+    "description": "Jouer 2 parties Blitz",
+    "rewardCoins": 70,
+    "rewardXp": 200,
+    "isWeekly": false
+  },
+  {
+    "type": "score",
+    "target": 5000,
+    "description": "Atteindre 5,000 points en une partie",
+    "rewardCoins": 95,
+    "rewardXp": 320,
+    "isWeekly": false
+  },
+  {
+    "type": "doubles",
+    "target": 3,
+    "description": "Réaliser 3 double lignes (2 lignes d'un coup)",
+    "rewardCoins": 70,
+    "rewardXp": 270,
+    "isWeekly": false
+  },
+  {
+    "type": "lines",
+    "target": 10,
+    "description": "Détruire 10 lignes au total",
+    "rewardCoins": 70,
+    "rewardXp": 240,
+    "isWeekly": false
+  },
+  {
+    "type": "blitz_played",
+    "target": 2,
+    "description": "Jouer 2 parties Blitz",
+    "rewardCoins": 70,
+    "rewardXp": 200,
+    "isWeekly": false
+  },
+  {
+    "type": "score",
+    "target": 9000,
+    "description": "Atteindre 9,000 points en une partie",
+    "rewardCoins": 80,
+    "rewardXp": 280,
+    "isWeekly": false
+  },
+  {
+    "type": "doubles",
+    "target": 7,
+    "description": "Réaliser 7 double lignes (2 lignes d'un coup)",
+    "rewardCoins": 110,
+    "rewardXp": 430,
+    "isWeekly": false
+  },
+  {
+    "type": "lines",
+    "target": 30,
+    "description": "Détruire 30 lignes au total",
+    "rewardCoins": 60,
+    "rewardXp": 210,
+    "isWeekly": false
+  },
+  {
+    "type": "blitz_played",
+    "target": 2,
+    "description": "Jouer 2 parties Blitz",
+    "rewardCoins": 70,
+    "rewardXp": 200,
+    "isWeekly": false
+  },
+  {
+    "type": "score",
+    "target": 13000,
+    "description": "Atteindre 13,000 points en une partie",
+    "rewardCoins": 65,
+    "rewardXp": 240,
+    "isWeekly": false
+  },
+  {
+    "type": "doubles",
+    "target": 5,
+    "description": "Réaliser 5 double lignes (2 lignes d'un coup)",
+    "rewardCoins": 90,
+    "rewardXp": 350,
+    "isWeekly": false
+  },
+  {
+    "type": "lines",
+    "target": 50,
+    "description": "Détruire 50 lignes au total",
+    "rewardCoins": 50,
+    "rewardXp": 180,
+    "isWeekly": false
+  },
+  {
+    "type": "blitz_played",
+    "target": 2,
+    "description": "Jouer 2 parties Blitz",
+    "rewardCoins": 70,
+    "rewardXp": 200,
+    "isWeekly": false
+  },
+  {
+    "type": "score",
+    "target": 2000,
+    "description": "Atteindre 2,000 points en une partie",
+    "rewardCoins": 50,
+    "rewardXp": 200,
+    "isWeekly": false
+  },
+  {
+    "type": "doubles",
+    "target": 3,
+    "description": "Réaliser 3 double lignes (2 lignes d'un coup)",
+    "rewardCoins": 70,
+    "rewardXp": 270,
+    "isWeekly": false
+  },
+  {
+    "type": "lines",
+    "target": 20,
+    "description": "Détruire 20 lignes au total",
+    "rewardCoins": 100,
+    "rewardXp": 330,
+    "isWeekly": false
+  },
+  {
+    "type": "blitz_played",
+    "target": 2,
+    "description": "Jouer 2 parties Blitz",
+    "rewardCoins": 70,
+    "rewardXp": 200,
+    "isWeekly": false
+  },
+  {
+    "type": "score",
+    "target": 6000,
+    "description": "Atteindre 6,000 points en une partie",
+    "rewardCoins": 110,
+    "rewardXp": 360,
+    "isWeekly": false
+  },
+  {
+    "type": "doubles",
+    "target": 7,
+    "description": "Réaliser 7 double lignes (2 lignes d'un coup)",
+    "rewardCoins": 110,
+    "rewardXp": 430,
+    "isWeekly": false
+  },
+  {
+    "type": "lines",
+    "target": 40,
+    "description": "Détruire 40 lignes au total",
+    "rewardCoins": 90,
+    "rewardXp": 300,
+    "isWeekly": false
+  },
+  {
+    "type": "blitz_played",
+    "target": 2,
+    "description": "Jouer 2 parties Blitz",
+    "rewardCoins": 70,
+    "rewardXp": 200,
+    "isWeekly": false
+  },
+  {
+    "type": "score",
+    "target": 10000,
+    "description": "Atteindre 10,000 points en une partie",
+    "rewardCoins": 95,
+    "rewardXp": 320,
+    "isWeekly": false
+  },
+  {
+    "type": "doubles",
+    "target": 5,
+    "description": "Réaliser 5 double lignes (2 lignes d'un coup)",
+    "rewardCoins": 90,
+    "rewardXp": 350,
+    "isWeekly": false
+  },
+  {
+    "type": "lines",
+    "target": 10,
+    "description": "Détruire 10 lignes au total",
+    "rewardCoins": 70,
+    "rewardXp": 240,
+    "isWeekly": false
+  },
+  {
+    "type": "blitz_played",
+    "target": 2,
+    "description": "Jouer 2 parties Blitz",
+    "rewardCoins": 70,
+    "rewardXp": 200,
+    "isWeekly": false
+  },
+  {
+    "type": "score",
+    "target": 14000,
+    "description": "Atteindre 14,000 points en une partie",
+    "rewardCoins": 80,
+    "rewardXp": 280,
+    "isWeekly": false
+  },
+  {
+    "type": "doubles",
+    "target": 3,
+    "description": "Réaliser 3 double lignes (2 lignes d'un coup)",
+    "rewardCoins": 70,
+    "rewardXp": 270,
+    "isWeekly": false
+  },
+  {
+    "type": "lines",
+    "target": 30,
+    "description": "Détruire 30 lignes au total",
+    "rewardCoins": 60,
+    "rewardXp": 210,
+    "isWeekly": false
+  },
+  {
+    "type": "blitz_played",
+    "target": 2,
+    "description": "Jouer 2 parties Blitz",
+    "rewardCoins": 70,
+    "rewardXp": 200,
+    "isWeekly": false
+  },
+  {
+    "type": "score",
+    "target": 3000,
+    "description": "Atteindre 3,000 points en une partie",
+    "rewardCoins": 65,
+    "rewardXp": 240,
+    "isWeekly": false
+  },
+  {
+    "type": "doubles",
+    "target": 7,
+    "description": "Réaliser 7 double lignes (2 lignes d'un coup)",
+    "rewardCoins": 110,
+    "rewardXp": 430,
+    "isWeekly": false
+  },
+  {
+    "type": "lines",
+    "target": 50,
+    "description": "Détruire 50 lignes au total",
+    "rewardCoins": 50,
+    "rewardXp": 180,
+    "isWeekly": false
+  },
+  {
+    "type": "blitz_played",
+    "target": 2,
+    "description": "Jouer 2 parties Blitz",
+    "rewardCoins": 70,
+    "rewardXp": 200,
+    "isWeekly": false
+  },
+  {
+    "type": "score",
+    "target": 7000,
+    "description": "Atteindre 7,000 points en une partie",
+    "rewardCoins": 50,
+    "rewardXp": 200,
+    "isWeekly": false
+  },
+  {
+    "type": "doubles",
+    "target": 5,
+    "description": "Réaliser 5 double lignes (2 lignes d'un coup)",
+    "rewardCoins": 90,
+    "rewardXp": 350,
+    "isWeekly": false
+  },
+  {
+    "type": "lines",
+    "target": 20,
+    "description": "Détruire 20 lignes au total",
+    "rewardCoins": 100,
+    "rewardXp": 330,
+    "isWeekly": false
+  },
+  {
+    "type": "blitz_played",
+    "target": 2,
+    "description": "Jouer 2 parties Blitz",
+    "rewardCoins": 70,
+    "rewardXp": 200,
+    "isWeekly": false
+  },
+  {
+    "type": "score",
+    "target": 11000,
+    "description": "Atteindre 11,000 points en une partie",
+    "rewardCoins": 110,
+    "rewardXp": 360,
+    "isWeekly": false
+  },
+  {
+    "type": "doubles",
+    "target": 3,
+    "description": "Réaliser 3 double lignes (2 lignes d'un coup)",
+    "rewardCoins": 70,
+    "rewardXp": 270,
+    "isWeekly": false
+  },
+  {
+    "type": "lines",
+    "target": 40,
+    "description": "Détruire 40 lignes au total",
+    "rewardCoins": 90,
+    "rewardXp": 300,
+    "isWeekly": false
+  },
+  {
+    "type": "blitz_played",
+    "target": 2,
+    "description": "Jouer 2 parties Blitz",
+    "rewardCoins": 70,
+    "rewardXp": 200,
+    "isWeekly": false
+  },
+  {
+    "type": "score",
+    "target": 15000,
+    "description": "Atteindre 15,000 points en une partie",
+    "rewardCoins": 95,
+    "rewardXp": 320,
+    "isWeekly": false
+  },
+  {
+    "type": "doubles",
+    "target": 7,
+    "description": "Réaliser 7 double lignes (2 lignes d'un coup)",
+    "rewardCoins": 110,
+    "rewardXp": 430,
+    "isWeekly": false
+  },
+  {
+    "type": "lines",
+    "target": 10,
+    "description": "Détruire 10 lignes au total",
+    "rewardCoins": 70,
+    "rewardXp": 240,
+    "isWeekly": false
+  },
+  {
+    "type": "blitz_played",
+    "target": 2,
+    "description": "Jouer 2 parties Blitz",
+    "rewardCoins": 70,
+    "rewardXp": 200,
+    "isWeekly": false
+  },
+  {
+    "type": "score",
+    "target": 4000,
+    "description": "Atteindre 4,000 points en une partie",
+    "rewardCoins": 80,
+    "rewardXp": 280,
+    "isWeekly": false
+  },
+  {
+    "type": "doubles",
+    "target": 5,
+    "description": "Réaliser 5 double lignes (2 lignes d'un coup)",
+    "rewardCoins": 90,
+    "rewardXp": 350,
+    "isWeekly": false
+  },
+  {
+    "type": "lines",
+    "target": 30,
+    "description": "Détruire 30 lignes au total",
+    "rewardCoins": 60,
+    "rewardXp": 210,
+    "isWeekly": false
+  },
+  {
+    "type": "blitz_played",
+    "target": 2,
+    "description": "Jouer 2 parties Blitz",
+    "rewardCoins": 70,
+    "rewardXp": 200,
+    "isWeekly": false
+  },
+  {
+    "type": "score",
+    "target": 8000,
+    "description": "Atteindre 8,000 points en une partie",
+    "rewardCoins": 65,
+    "rewardXp": 240,
+    "isWeekly": false
+  },
+  {
+    "type": "doubles",
+    "target": 3,
+    "description": "Réaliser 3 double lignes (2 lignes d'un coup)",
+    "rewardCoins": 70,
+    "rewardXp": 270,
+    "isWeekly": false
+  },
+  {
+    "type": "lines",
+    "target": 50,
+    "description": "Détruire 50 lignes au total",
+    "rewardCoins": 50,
+    "rewardXp": 180,
+    "isWeekly": false
+  },
+  {
+    "type": "blitz_played",
+    "target": 2,
+    "description": "Jouer 2 parties Blitz",
+    "rewardCoins": 70,
+    "rewardXp": 200,
+    "isWeekly": false
+  },
+  {
+    "type": "score",
+    "target": 12000,
+    "description": "Atteindre 12,000 points en une partie",
+    "rewardCoins": 50,
+    "rewardXp": 200,
+    "isWeekly": false
+  },
+  {
+    "type": "doubles",
+    "target": 7,
+    "description": "Réaliser 7 double lignes (2 lignes d'un coup)",
+    "rewardCoins": 110,
+    "rewardXp": 430,
+    "isWeekly": false
+  },
+  {
+    "type": "lines",
+    "target": 20,
+    "description": "Détruire 20 lignes au total",
+    "rewardCoins": 100,
+    "rewardXp": 330,
+    "isWeekly": false
+  },
+  {
+    "type": "blitz_played",
+    "target": 2,
+    "description": "Jouer 2 parties Blitz",
+    "rewardCoins": 70,
+    "rewardXp": 200,
+    "isWeekly": false
+  },
+  {
+    "type": "score",
+    "target": 16000,
+    "description": "Atteindre 16,000 points en une partie",
+    "rewardCoins": 110,
+    "rewardXp": 360,
+    "isWeekly": false
+  },
+  {
+    "type": "doubles",
+    "target": 5,
+    "description": "Réaliser 5 double lignes (2 lignes d'un coup)",
+    "rewardCoins": 90,
+    "rewardXp": 350,
+    "isWeekly": false
+  },
+  {
+    "type": "lines",
+    "target": 40,
+    "description": "Détruire 40 lignes au total",
+    "rewardCoins": 90,
+    "rewardXp": 300,
+    "isWeekly": false
+  },
+  {
+    "type": "blitz_played",
+    "target": 2,
+    "description": "Jouer 2 parties Blitz",
+    "rewardCoins": 70,
+    "rewardXp": 200,
+    "isWeekly": false
+  },
+  {
+    "type": "score",
+    "target": 5000,
+    "description": "Atteindre 5,000 points en une partie",
+    "rewardCoins": 95,
+    "rewardXp": 320,
+    "isWeekly": false
+  },
+  {
+    "type": "doubles",
+    "target": 3,
+    "description": "Réaliser 3 double lignes (2 lignes d'un coup)",
+    "rewardCoins": 70,
+    "rewardXp": 270,
+    "isWeekly": false
+  },
+  {
+    "type": "lines",
+    "target": 10,
+    "description": "Détruire 10 lignes au total",
+    "rewardCoins": 70,
+    "rewardXp": 240,
+    "isWeekly": false
+  }
+]

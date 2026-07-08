@@ -1,0 +1,40 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@theme {
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
+}
+
+@keyframes flash {
+  0%, 100% { background-color: transparent; }
+  50% { background-color: rgba(239, 68, 68, 0.4); }
+}
+.animate-flash {
+  animation: flash 1s infinite;
+}
+
+@keyframes breakChain {
+  0% { transform: scale(1); opacity: 1; filter: grayscale(0); }
+  20% { transform: scale(1.1) rotate(5deg); filter: grayscale(0.5); }
+  50% { transform: scale(1.2) rotate(-15deg); filter: grayscale(1); }
+  100% { transform: translateY(100px) rotate(-30deg); opacity: 0; filter: grayscale(1); }
+}
+.animate-break {
+  animation: breakChain 1s forwards;
+}
+
+/* Custom scrollbar for campaign level list */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.4);
+}
