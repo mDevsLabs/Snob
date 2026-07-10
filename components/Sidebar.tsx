@@ -20,8 +20,8 @@ export default function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
       title: "🎮 Jeu de Prestige",
       items: [
         { id: "classic", label: "Classique", icon: Grid },
-        { id: "special", label: "Spécial 💣", icon: Bomb },
-        { id: "daily", label: "Défi 📅", icon: Calendar },
+        { id: "special", label: "Spécial", icon: Bomb },
+        { id: "daily", label: "Défi", icon: Calendar },
         { id: "campaign", label: "Campagne", icon: Target },
         { id: "blitz", label: "Mode Blitz", icon: Zap },
       ]

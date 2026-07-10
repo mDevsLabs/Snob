@@ -130,7 +130,7 @@ interface GameState {
   closeAuthModal: () => void;
   loginWithGoogle: () => Promise<void>;
   loginWithEmail: (email: string, pass: string) => Promise<void>;
-  registerWithEmail: (email: string, pass: string) => Promise<void>;
+  registerWithEmail: (email: string, pass: string, name?: string) => Promise<void>;
   logout: () => Promise<void>;
   addCoins: (amount: number) => void;
   addSp: (amount: number) => void;
@@ -304,30 +304,27 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [state, setState] = useState<Partial<GameState>>({});
   const [isLoaded, setIsLoaded] = useState(false);
 
-  // Better Auth Session listener
+  // Better Auth: écoute de session via le hook officiel
+  // On utilise authClient.useSession() qui écoute les changements de cookie de session
+  const { data: sessionData, isPending: sessionPending } = authClient.useSession();
+
   useEffect(() => {
-    const handleSessionChange = () => {
-      const stored = localStorage.getItem("better_auth_session");
-      if (stored) {
-        const { user } = JSON.parse(stored);
-        setState((s) => ({ 
-          ...s, 
-          uid: user.id, 
-          email: user.email, 
+    if (!sessionPending) {
+      if (sessionData?.user) {
+        const { user } = sessionData;
+        setState((s) => ({
+          ...s,
+          uid: user.id,
+          email: user.email,
           username: (s.username === "Snob Anonyme" || !s.username) ? user.name : s.username,
-          authResolved: true 
+          authResolved: true,
         }));
       } else {
         setState((s) => ({ ...s, uid: null, email: null, authResolved: true }));
       }
-    };
+    }
+  }, [sessionData, sessionPending]);
 
-    handleSessionChange();
-    window.addEventListener("better-auth-session-change", handleSessionChange);
-    return () => {
-      window.removeEventListener("better-auth-session-change", handleSessionChange);
-    };
-  }, []);
 
   // Load from local storage
   useEffect(() => {
@@ -414,6 +411,9 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         inventory: parsed.inventory || ["default_skin", "default_trail"],
         equippedSkin: parsed.equippedSkin || "default_skin",
         equippedTrail: parsed.equippedTrail || "default_trail",
+        equippedTheme: parsed.equippedTheme || "theme_classic",     // FIX
+        equippedAvatarFrame: parsed.equippedAvatarFrame || "frame_simple", // FIX
+        unlockedAchievements: parsed.unlockedAchievements || [],     // FIX
         username: parsed.username || "Snob Anonyme",
         bio: parsed.bio || "Je suis un snob mystérieux.",
         avatar: parsed.avatar || "🎩",
@@ -451,6 +451,9 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         inventory: state.inventory,
         equippedSkin: state.equippedSkin,
         equippedTrail: state.equippedTrail,
+        equippedTheme: state.equippedTheme,      // FIX: était manquant
+        equippedAvatarFrame: state.equippedAvatarFrame, // FIX: était manquant
+        unlockedAchievements: state.unlockedAchievements, // FIX: était manquant
         username: state.username,
         bio: state.bio,
         avatar: state.avatar,
@@ -1109,15 +1112,23 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const loginWithEmail = async (email: string, pass: string) => {
-    await authClient.signIn.email({ email, password: pass });
+    const result = await authClient.signIn.email({ email, password: pass });
+    if (result.error) throw new Error(result.error.message || "Identifiants incorrects.");
   };
 
-  const registerWithEmail = async (email: string, pass: string) => {
-    await authClient.signUp.email({ email, password: pass, name: email.split("@")[0] });
+  const registerWithEmail = async (email: string, pass: string, name?: string) => {
+    const result = await authClient.signUp.email({ 
+      email, 
+      password: pass, 
+      name: name || email.split("@")[0] 
+    });
+    if (result.error) throw new Error(result.error.message || "Erreur lors de la création du compte.");
   };
 
   const logout = async () => {
     await authClient.signOut();
+    // Reset état auth local
+    setState(s => ({ ...s, uid: null, email: null }));
   };
 
   if (!isLoaded) return null;
