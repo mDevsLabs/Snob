@@ -2,6 +2,8 @@
 import React, { useState } from 'react';
 import { useGameStore } from '@/lib/store';
 import { SKINS } from '@/lib/skins';
+import { THEMES } from '@/lib/themes';
+import { AVATARS, AVATAR_FRAMES } from '@/lib/avatars';
 import { TRAILS } from '@/lib/trails';
 import { GADGETS } from '@/lib/gadgets';
 import { motion } from 'motion/react';
@@ -13,7 +15,7 @@ import { sounds } from '@/lib/audio';
 export default function Inventory() {
   const { inventory, equippedSkin, equipSkin, equippedTrail, equipTrail, soundEnabled } = useGameStore();
   const confetti = useConfetti();
-  const [activeTab, setActiveTab] = useState<'skins' | 'trails' | 'gadgets'>('skins');
+  const [activeTab, setActiveTab] = useState<'skins' | 'trails' | 'gadgets' | 'themes' | 'avatars'>('skins');
 
   const getRarityBadgeStyle = (rarity: string) => {
     switch (rarity) {
@@ -108,6 +110,28 @@ export default function Inventory() {
           )}
         >
           Traînées d&apos;Effets ✨
+        </button>
+        <button
+          onClick={() => setActiveTab('themes')}
+          className={cn(
+            "flex-1 py-4 px-4 rounded-xl text-xs sm:text-sm font-black font-mono transition-all uppercase tracking-wider whitespace-nowrap",
+            activeTab === 'themes'
+              ? "bg-gradient-to-r from-red-500 to-rose-600 text-white shadow-[0_0_20px_rgba(244,63,94,0.4)] z-10"
+              : "text-slate-400 hover:text-white hover:bg-white/5 opacity-70 hover:opacity-100"
+          )}
+        >
+          Thèmes 🖼️
+        </button>
+        <button
+          onClick={() => setActiveTab('avatars')}
+          className={cn(
+            "flex-1 py-4 px-4 rounded-xl text-xs sm:text-sm font-black font-mono transition-all uppercase tracking-wider whitespace-nowrap",
+            activeTab === 'avatars'
+              ? "bg-gradient-to-r from-indigo-500 to-violet-600 text-white shadow-[0_0_20px_rgba(99,102,241,0.4)] z-10"
+              : "text-slate-400 hover:text-white hover:bg-white/5 opacity-70 hover:opacity-100"
+          )}
+        >
+          Avatars 👤
         </button>
         <button
           onClick={() => setActiveTab('gadgets')}

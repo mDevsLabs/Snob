@@ -25,7 +25,7 @@ export interface GameSession {
   id: string;
   date: string;
   score: number;
-  type: "classic" | "campaign" | "blitz";
+  type: "classic" | "campaign" | "blitz" | "special" | "daily";
 }
 
 const generateInitialHistory = (): GameSession[] => {
@@ -101,6 +101,13 @@ interface GameState {
   classicHighScore: number;
   inventory: string[];
   equippedSkin: string;
+  equippedAvatarFrame: string;
+  equippedTheme: string;
+  unlockedAchievements: string[];
+  newAchievement: any | null;
+  dailyChallengeCompleted: string | null;
+  dailyChallengeScore: number;
+  club: any | null;
   equippedTrail: string;
   username: string;
   avatar: string;
@@ -137,12 +144,23 @@ interface GameState {
   toggleSound: () => void;
   buyItem: (itemId: string, price: number, isConsumable?: boolean) => boolean;
   equipSkin: (itemId: string) => void;
+  equipAvatar: (id: string) => void;
+  equipAvatarFrame: (id: string) => void;
+  equipTheme: (id: string) => void;
+  unlockAchievement: (id: string) => void;
+  dismissAchievement: () => void;
+  setDailyChallengeCompleted: (date: string, score: number) => void;
+  createClub: (name: string, icon: string) => void;
+  joinClub: (club: any) => void;
+  leaveClub: () => void;
+  contributeSP: (amount: number) => void;
+  claimClubReward: (rewardId: string) => void;
   equipTrail: (itemId: string) => void;
   consumeItem: (itemId: string) => boolean;
   buySnobPass: () => boolean;
   claimSnobPassReward: (tier: number, rewardType: string, rewardId: string, amount: number) => boolean;
   updateClassicHighScore: (score: number) => void;
-  recordGame: (score: number, type: "classic" | "campaign" | "blitz") => void;
+  recordGame: (score: number, type: "classic" | "campaign" | "blitz" | "special" | "daily") => void;
   buyMysteryBox: (boxType: "mystery" | "epic") => { success: boolean; loot?: LootResult; error?: string };
   reducedMotion: boolean;
   colorblindMode: "none" | "symbols" | "high-contrast";
@@ -175,6 +193,13 @@ const defaultState: GameState = {
   classicHighScore: 0,
   inventory: ["default_skin", "default_trail"],
   equippedSkin: "default_skin",
+  equippedAvatarFrame: "frame_simple",
+  equippedTheme: "theme_classic",
+  unlockedAchievements: [],
+  newAchievement: null,
+  dailyChallengeCompleted: null,
+  dailyChallengeScore: 0,
+  club: null,
   equippedTrail: "default_trail",
   username: "Snob Anonyme",
   avatar: "🎩",
@@ -211,6 +236,17 @@ const defaultState: GameState = {
   toggleSound: () => {},
   buyItem: () => false,
   equipSkin: () => {},
+  equipAvatar: () => {},
+  equipAvatarFrame: () => {},
+  equipTheme: () => {},
+  unlockAchievement: () => {},
+  dismissAchievement: () => {},
+  setDailyChallengeCompleted: () => {},
+  createClub: () => {},
+  joinClub: () => {},
+  leaveClub: () => {},
+  contributeSP: () => {},
+  claimClubReward: () => {},
   equipTrail: () => {},
   consumeItem: () => false,
   buySnobPass: () => false,
@@ -682,6 +718,48 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return success;
   };
 
+  
+  const equipAvatar = (id: string) => {
+    setState(s => ({ ...s, avatar: id }));
+  };
+  const equipAvatarFrame = (id: string) => {
+    setState(s => ({ ...s, equippedAvatarFrame: id }));
+  };
+  const equipTheme = (id: string) => {
+    setState(s => ({ ...s, equippedTheme: id }));
+  };
+  const unlockAchievement = (id: string) => {
+    setState(s => {
+      if (s.unlockedAchievements?.includes(id)) return s;
+      const ach = { id, name: "Nouveau Succès", description: "Vous avez débloqué un succès !", icon: "🏅" }; // Simplification
+      return { ...s, unlockedAchievements: [...(s.unlockedAchievements || []), id], newAchievement: ach };
+    });
+  };
+  const dismissAchievement = () => {
+    setState(s => ({ ...s, newAchievement: null }));
+  };
+  const setDailyChallengeCompleted = (date: string, score: number) => {
+    setState(s => ({ ...s, dailyChallengeCompleted: date, dailyChallengeScore: score }));
+  };
+  const createClub = (name: string, icon: string) => {
+    setState(s => ({ ...s, club: { id: "club_" + Date.now(), name, icon, level: 1, sp: 0, members: 1, maxMembers: 50 } }));
+  };
+  const joinClub = (club: any) => {
+    setState(s => ({ ...s, club }));
+  };
+  const leaveClub = () => {
+    setState(s => ({ ...s, club: null }));
+  };
+  const contributeSP = (amount: number) => {
+    setState(s => {
+      if (!s.club || (s.coins || 0) < amount) return s;
+      return { ...s, coins: (s.coins || 0) - amount, club: { ...s.club, sp: s.club.sp + amount } };
+    });
+  };
+  const claimClubReward = (rewardId: string) => {
+    // Logic for reward
+  };
+
   const equipSkin = (itemId: string) => {
     setState((s) => {
       if (s.inventory?.includes(itemId)) {
@@ -709,7 +787,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
   };
 
-  const recordGame = (score: number, type: "classic" | "campaign" | "blitz") => {
+  const recordGame = (score: number, type: "classic" | "campaign" | "blitz" | "special" | "daily") => {
     setState((s) => {
       const newSession: GameSession = {
         id: `g-${Date.now()}-${Math.random().toString(36).substring(7)}`,
@@ -1065,6 +1143,17 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         buySnobPass,
         claimSnobPassReward,
         equipSkin,
+        equipAvatar,
+        equipAvatarFrame,
+        equipTheme,
+        unlockAchievement,
+        dismissAchievement,
+        setDailyChallengeCompleted,
+        createClub,
+        joinClub,
+        leaveClub,
+        contributeSP,
+        claimClubReward,
         equipTrail,
         updateClassicHighScore,
         recordGame,

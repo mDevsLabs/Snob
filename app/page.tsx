@@ -21,6 +21,11 @@ import { ConfettiProvider } from "@/components/ConfettiProvider";
 
 
 
+import SpecialMode from "@/components/SpecialMode";
+import DailyChallenge from "@/components/DailyChallenge";
+import Clubs from "@/components/Clubs";
+import AchievementToast from "@/components/AchievementToast";
+
 export default function Home() {
   const [activeTab, setActiveTab] = useState<TabType>("classic");
 
@@ -80,8 +85,11 @@ export default function Home() {
           
           <main className="flex-1 relative overflow-y-auto">
             {activeTab === "classic" && <Classic />}
+            {activeTab === "special" && <SpecialMode />}
+            {activeTab === "daily" && <DailyChallenge />}
             {activeTab === "campaign" && <Campaign />}
             {activeTab === "blitz" && <Blitz />}
+            {activeTab === "clubs" && <Clubs />}
             {activeTab === "quests" && <Quests />}
             {activeTab === "profile" && <Profile />}
             {activeTab === "inventory" && <Inventory />}
@@ -94,6 +102,7 @@ export default function Home() {
           <LevelUpAlert />
           <AuthModal />
           <AuthPrompt />
+          <AchievementToast />
         </div>
         </ConfettiProvider>
       </GameProvider>

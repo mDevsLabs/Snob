@@ -48,4 +48,4 @@ export interface AppState {
   buySnobPass: () => boolean;
   claimSnobPassReward: (tier: number, rewardType: string, rewardId: string, amount: number) => boolean;
 }
-export type TabType = "classic" | "campaign" | "blitz" | "quests" | "profile" | "inventory" | "shop" | "snob-pass" | "settings";
+export type TabType = "classic" | "campaign" | "blitz" | "special" | "daily" | "clubs" | "quests" | "profile" | "inventory" | "shop" | "snob-pass" | "settings";

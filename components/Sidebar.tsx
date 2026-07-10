@@ -2,7 +2,7 @@
 import React from "react";
 import Image from "next/image";
 import { useGameStore } from "@/lib/store";
-import { Target, Zap, Scroll, UserCircle2, Coins, Grid, ShoppingCart, Package, Crown, Settings, ChevronDown } from "lucide-react";
+import { Target, Zap, Scroll, UserCircle2, Coins, Grid, ShoppingCart, Package, Crown, Settings, ChevronDown, Bomb, Calendar, Users } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { cn } from "@/lib/utils";
 import { TabType } from "@/lib/types";
@@ -20,6 +20,8 @@ export default function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
       title: "🎮 Jeu de Prestige",
       items: [
         { id: "classic", label: "Classique", icon: Grid },
+        { id: "special", label: "Spécial 💣", icon: Bomb },
+        { id: "daily", label: "Défi 📅", icon: Calendar },
         { id: "campaign", label: "Campagne", icon: Target },
         { id: "blitz", label: "Mode Blitz", icon: Zap },
       ]
@@ -27,6 +29,7 @@ export default function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
     {
       title: "🛍️ Boutique & Objets",
       items: [
+        { id: "clubs", label: "Clubs", icon: Users },
         { id: "quests", label: "Quêtes", icon: Scroll },
         { id: "inventory", label: "Inventaire", icon: Package },
         { id: "shop", label: "Boutique", icon: ShoppingCart },
