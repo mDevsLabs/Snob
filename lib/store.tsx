@@ -25,7 +25,7 @@ export interface GameSession {
   id: string;
   date: string;
   score: number;
-  type: "classic" | "campaign" | "blitz";
+  type: "classic" | "campaign" | "blitz" | "special" | "daily";
 }
 
 const generateInitialHistory = (): GameSession[] => {
@@ -101,6 +101,13 @@ interface GameState {
   classicHighScore: number;
   inventory: string[];
   equippedSkin: string;
+  equippedAvatarFrame: string;
+  equippedTheme: string;
+  unlockedAchievements: string[];
+  newAchievement: any | null;
+  dailyChallengeCompleted: string | null;
+  dailyChallengeScore: number;
+  club: any | null;
   equippedTrail: string;
   username: string;
   avatar: string;
@@ -123,7 +130,7 @@ interface GameState {
   closeAuthModal: () => void;
   loginWithGoogle: () => Promise<void>;
   loginWithEmail: (email: string, pass: string) => Promise<void>;
-  registerWithEmail: (email: string, pass: string) => Promise<void>;
+  registerWithEmail: (email: string, pass: string, name?: string) => Promise<void>;
   logout: () => Promise<void>;
   addCoins: (amount: number) => void;
   addSp: (amount: number) => void;
@@ -137,13 +144,36 @@ interface GameState {
   toggleSound: () => void;
   buyItem: (itemId: string, price: number, isConsumable?: boolean) => boolean;
   equipSkin: (itemId: string) => void;
+  equipAvatar: (id: string) => void;
+  equipAvatarFrame: (id: string) => void;
+  equipTheme: (id: string) => void;
+  unlockAchievement: (id: string) => void;
+  dismissAchievement: () => void;
+  setDailyChallengeCompleted: (date: string, score: number) => void;
+  createClub: (name: string, icon: string) => void;
+  joinClub: (club: any) => void;
+  leaveClub: () => void;
+  contributeSP: (amount: number) => void;
+  claimClubReward: (rewardId: string) => void;
   equipTrail: (itemId: string) => void;
   consumeItem: (itemId: string) => boolean;
   buySnobPass: () => boolean;
   claimSnobPassReward: (tier: number, rewardType: string, rewardId: string, amount: number) => boolean;
   updateClassicHighScore: (score: number) => void;
-  recordGame: (score: number, type: "classic" | "campaign" | "blitz") => void;
+  recordGame: (score: number, type: "classic" | "campaign" | "blitz" | "special" | "daily") => void;
   buyMysteryBox: (boxType: "mystery" | "epic") => { success: boolean; loot?: LootResult; error?: string };
+  reducedMotion: boolean;
+  colorblindMode: "none" | "symbols" | "high-contrast";
+  screenShake: boolean;
+  particleDensity: "none" | "low" | "medium" | "high";
+  gridContrast: "normal" | "high";
+  aimGuide: boolean;
+  setReducedMotion: (val: boolean) => void;
+  setColorblindMode: (val: "none" | "symbols" | "high-contrast") => void;
+  setScreenShake: (val: boolean) => void;
+  setParticleDensity: (val: "none" | "low" | "medium" | "high") => void;
+  setGridContrast: (val: "normal" | "high") => void;
+  setAimGuide: (val: boolean) => void;
 }
 
 const defaultState: GameState = {
@@ -163,6 +193,13 @@ const defaultState: GameState = {
   classicHighScore: 0,
   inventory: ["default_skin", "default_trail"],
   equippedSkin: "default_skin",
+  equippedAvatarFrame: "frame_simple",
+  equippedTheme: "theme_classic",
+  unlockedAchievements: [],
+  newAchievement: null,
+  dailyChallengeCompleted: null,
+  dailyChallengeScore: 0,
+  club: null,
   equippedTrail: "default_trail",
   username: "Snob Anonyme",
   avatar: "🎩",
@@ -199,6 +236,17 @@ const defaultState: GameState = {
   toggleSound: () => {},
   buyItem: () => false,
   equipSkin: () => {},
+  equipAvatar: () => {},
+  equipAvatarFrame: () => {},
+  equipTheme: () => {},
+  unlockAchievement: () => {},
+  dismissAchievement: () => {},
+  setDailyChallengeCompleted: () => {},
+  createClub: () => {},
+  joinClub: () => {},
+  leaveClub: () => {},
+  contributeSP: () => {},
+  claimClubReward: () => {},
   equipTrail: () => {},
   consumeItem: () => false,
   buySnobPass: () => false,
@@ -206,6 +254,18 @@ const defaultState: GameState = {
   updateClassicHighScore: () => {},
   recordGame: () => {},
   buyMysteryBox: () => ({ success: false, error: "Not implemented" }),
+  reducedMotion: false,
+  colorblindMode: "none",
+  screenShake: true,
+  particleDensity: "high",
+  gridContrast: "normal",
+  aimGuide: true,
+  setReducedMotion: () => {},
+  setColorblindMode: () => {},
+  setScreenShake: () => {},
+  setParticleDensity: () => {},
+  setGridContrast: () => {},
+  setAimGuide: () => {},
 };
 
 const GameContext = createContext<GameState>(defaultState);
@@ -244,30 +304,27 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [state, setState] = useState<Partial<GameState>>({});
   const [isLoaded, setIsLoaded] = useState(false);
 
-  // Better Auth Session listener
+  // Better Auth: écoute de session via le hook officiel
+  // On utilise authClient.useSession() qui écoute les changements de cookie de session
+  const { data: sessionData, isPending: sessionPending } = authClient.useSession();
+
   useEffect(() => {
-    const handleSessionChange = () => {
-      const stored = localStorage.getItem("better_auth_session");
-      if (stored) {
-        const { user } = JSON.parse(stored);
-        setState((s) => ({ 
-          ...s, 
-          uid: user.id, 
-          email: user.email, 
+    if (!sessionPending) {
+      if (sessionData?.user) {
+        const { user } = sessionData;
+        setState((s) => ({
+          ...s,
+          uid: user.id,
+          email: user.email,
           username: (s.username === "Snob Anonyme" || !s.username) ? user.name : s.username,
-          authResolved: true 
+          authResolved: true,
         }));
       } else {
         setState((s) => ({ ...s, uid: null, email: null, authResolved: true }));
       }
-    };
+    }
+  }, [sessionData, sessionPending]);
 
-    handleSessionChange();
-    window.addEventListener("better-auth-session-change", handleSessionChange);
-    return () => {
-      window.removeEventListener("better-auth-session-change", handleSessionChange);
-    };
-  }, []);
 
   // Load from local storage
   useEffect(() => {
@@ -354,6 +411,9 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         inventory: parsed.inventory || ["default_skin", "default_trail"],
         equippedSkin: parsed.equippedSkin || "default_skin",
         equippedTrail: parsed.equippedTrail || "default_trail",
+        equippedTheme: parsed.equippedTheme || "theme_classic",     // FIX
+        equippedAvatarFrame: parsed.equippedAvatarFrame || "frame_simple", // FIX
+        unlockedAchievements: parsed.unlockedAchievements || [],     // FIX
         username: parsed.username || "Snob Anonyme",
         bio: parsed.bio || "Je suis un snob mystérieux.",
         avatar: parsed.avatar || "🎩",
@@ -361,6 +421,12 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         claimedSnobPassTiers: parsed.claimedSnobPassTiers || [],
         dailyRewardClaimed: dailyRewardClaimed,
         lastDailyRewardClaim: parsed.lastDailyRewardClaim || null,
+        reducedMotion: parsed.reducedMotion ?? false,
+        colorblindMode: parsed.colorblindMode ?? "none",
+        screenShake: parsed.screenShake ?? true,
+        particleDensity: parsed.particleDensity ?? "high",
+        gridContrast: parsed.gridContrast ?? "normal",
+        aimGuide: parsed.aimGuide ?? true,
       });
       setIsLoaded(true);
     }, 0);
@@ -385,6 +451,9 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         inventory: state.inventory,
         equippedSkin: state.equippedSkin,
         equippedTrail: state.equippedTrail,
+        equippedTheme: state.equippedTheme,      // FIX: était manquant
+        equippedAvatarFrame: state.equippedAvatarFrame, // FIX: était manquant
+        unlockedAchievements: state.unlockedAchievements, // FIX: était manquant
         username: state.username,
         bio: state.bio,
         avatar: state.avatar,
@@ -392,7 +461,13 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         claimedSnobPassTiers: state.claimedSnobPassTiers,
         dailyRewardClaimed: state.dailyRewardClaimed,
         lastQuestResetDate: startOfDay(new Date()).toISOString(),
-        lastDailyRewardClaim: state.lastDailyRewardClaim
+        lastDailyRewardClaim: state.lastDailyRewardClaim,
+        reducedMotion: state.reducedMotion,
+        colorblindMode: state.colorblindMode,
+        screenShake: state.screenShake,
+        particleDensity: state.particleDensity,
+        gridContrast: state.gridContrast,
+        aimGuide: state.aimGuide,
       }));
     }
   }, [state, isLoaded]);
@@ -646,6 +721,48 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return success;
   };
 
+  
+  const equipAvatar = (id: string) => {
+    setState(s => ({ ...s, avatar: id }));
+  };
+  const equipAvatarFrame = (id: string) => {
+    setState(s => ({ ...s, equippedAvatarFrame: id }));
+  };
+  const equipTheme = (id: string) => {
+    setState(s => ({ ...s, equippedTheme: id }));
+  };
+  const unlockAchievement = (id: string) => {
+    setState(s => {
+      if (s.unlockedAchievements?.includes(id)) return s;
+      const ach = { id, name: "Nouveau Succès", description: "Vous avez débloqué un succès !", icon: "🏅" }; // Simplification
+      return { ...s, unlockedAchievements: [...(s.unlockedAchievements || []), id], newAchievement: ach };
+    });
+  };
+  const dismissAchievement = () => {
+    setState(s => ({ ...s, newAchievement: null }));
+  };
+  const setDailyChallengeCompleted = (date: string, score: number) => {
+    setState(s => ({ ...s, dailyChallengeCompleted: date, dailyChallengeScore: score }));
+  };
+  const createClub = (name: string, icon: string) => {
+    setState(s => ({ ...s, club: { id: "club_" + Date.now(), name, icon, level: 1, sp: 0, members: 1, maxMembers: 50 } }));
+  };
+  const joinClub = (club: any) => {
+    setState(s => ({ ...s, club }));
+  };
+  const leaveClub = () => {
+    setState(s => ({ ...s, club: null }));
+  };
+  const contributeSP = (amount: number) => {
+    setState(s => {
+      if (!s.club || (s.coins || 0) < amount) return s;
+      return { ...s, coins: (s.coins || 0) - amount, club: { ...s.club, sp: s.club.sp + amount } };
+    });
+  };
+  const claimClubReward = (rewardId: string) => {
+    // Logic for reward
+  };
+
   const equipSkin = (itemId: string) => {
     setState((s) => {
       if (s.inventory?.includes(itemId)) {
@@ -673,7 +790,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
   };
 
-  const recordGame = (score: number, type: "classic" | "campaign" | "blitz") => {
+  const recordGame = (score: number, type: "classic" | "campaign" | "blitz" | "special" | "daily") => {
     setState((s) => {
       const newSession: GameSession = {
         id: `g-${Date.now()}-${Math.random().toString(36).substring(7)}`,
@@ -995,15 +1112,23 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const loginWithEmail = async (email: string, pass: string) => {
-    await authClient.signIn.email({ email, password: pass });
+    const result = await authClient.signIn.email({ email, password: pass });
+    if (result.error) throw new Error(result.error.message || "Identifiants incorrects.");
   };
 
-  const registerWithEmail = async (email: string, pass: string) => {
-    await authClient.signUp.email({ email, password: pass, name: email.split("@")[0] });
+  const registerWithEmail = async (email: string, pass: string, name?: string) => {
+    const result = await authClient.signUp.email({ 
+      email, 
+      password: pass, 
+      name: name || email.split("@")[0] 
+    });
+    if (result.error) throw new Error(result.error.message || "Erreur lors de la création du compte.");
   };
 
   const logout = async () => {
     await authClient.signOut();
+    // Reset état auth local
+    setState(s => ({ ...s, uid: null, email: null }));
   };
 
   if (!isLoaded) return null;
@@ -1029,6 +1154,17 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         buySnobPass,
         claimSnobPassReward,
         equipSkin,
+        equipAvatar,
+        equipAvatarFrame,
+        equipTheme,
+        unlockAchievement,
+        dismissAchievement,
+        setDailyChallengeCompleted,
+        createClub,
+        joinClub,
+        leaveClub,
+        contributeSP,
+        claimClubReward,
         equipTrail,
         updateClassicHighScore,
         recordGame,
@@ -1045,6 +1181,18 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         registerWithEmail,
         logout,
         dismissLevelUpReward: () => setState((s) => ({ ...s, levelUpReward: null })),
+        reducedMotion: state.reducedMotion ?? false,
+        colorblindMode: state.colorblindMode ?? "none",
+        screenShake: state.screenShake ?? true,
+        particleDensity: state.particleDensity ?? "high",
+        gridContrast: state.gridContrast ?? "normal",
+        aimGuide: state.aimGuide ?? true,
+        setReducedMotion: (val: boolean) => setState((s) => ({ ...s, reducedMotion: val })),
+        setColorblindMode: (val: "none" | "symbols" | "high-contrast") => setState((s) => ({ ...s, colorblindMode: val })),
+        setScreenShake: (val: boolean) => setState((s) => ({ ...s, screenShake: val })),
+        setParticleDensity: (val: "none" | "low" | "medium" | "high") => setState((s) => ({ ...s, particleDensity: val })),
+        setGridContrast: (val: "normal" | "high") => setState((s) => ({ ...s, gridContrast: val })),
+        setAimGuide: (val: boolean) => setState((s) => ({ ...s, aimGuide: val })),
       }}
     >
       {children}

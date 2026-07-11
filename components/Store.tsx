@@ -2,6 +2,8 @@
 import React, { useState } from 'react';
 import { useGameStore, LootResult } from '@/lib/store';
 import { SKINS } from '@/lib/skins';
+import { THEMES } from '@/lib/themes';
+import { AVATARS, AVATAR_FRAMES } from '@/lib/avatars';
 import { TRAILS } from '@/lib/trails';
 import { GADGETS } from '@/lib/gadgets';
 import { RESOURCES } from '@/lib/resources';
@@ -20,7 +22,7 @@ export default function Store() {
   const confetti = useConfetti();
   const [purchaseMsg, setPurchaseMsg] = useState<{ text: string; success: boolean } | null>(null);
   const [selectedRarity, setSelectedRarity] = useState<FilterRarity>('All');
-  const [activeTab, setActiveTab] = useState<'skins' | 'trails' | 'gadgets' | 'resources'>('skins');
+  const [activeTab, setActiveTab] = useState<'skins' | 'trails' | 'gadgets' | 'resources' | 'themes' | 'avatars'>('skins');
   const [openerOpen, setOpenerOpen] = useState(false);
   const [openedBoxType, setOpenedBoxType] = useState<'mystery' | 'epic' | null>(null);
   const [lootResult, setLootResult] = useState<LootResult | null>(null);
@@ -167,6 +169,34 @@ export default function Store() {
           )}
         >
           Gadgets Tactiques ⚙️
+        </button>
+        <button
+          onClick={() => {
+            setActiveTab('themes');
+            setSelectedRarity('All');
+          }}
+          className={cn(
+            "flex-1 py-4 px-4 rounded-xl text-xs sm:text-sm font-black font-mono transition-all uppercase tracking-wider whitespace-nowrap",
+            activeTab === 'themes'
+              ? "bg-gradient-to-r from-red-500 to-rose-600 text-white shadow-[0_0_20px_rgba(244,63,94,0.4)] z-10"
+              : "text-slate-400 hover:text-white hover:bg-white/5 opacity-70 hover:opacity-100"
+          )}
+        >
+          Thèmes 🖼️
+        </button>
+        <button
+          onClick={() => {
+            setActiveTab('avatars');
+            setSelectedRarity('All');
+          }}
+          className={cn(
+            "flex-1 py-4 px-4 rounded-xl text-xs sm:text-sm font-black font-mono transition-all uppercase tracking-wider whitespace-nowrap",
+            activeTab === 'avatars'
+              ? "bg-gradient-to-r from-indigo-500 to-violet-600 text-white shadow-[0_0_20px_rgba(99,102,241,0.4)] z-10"
+              : "text-slate-400 hover:text-white hover:bg-white/5 opacity-70 hover:opacity-100"
+          )}
+        >
+          Avatars 👤
         </button>
         <button
           onClick={() => {

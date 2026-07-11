@@ -44,11 +44,13 @@ function createTrailParticle(
 export default function Classic() {
   const { 
     grid, hand, score, gameOver, placeShape, reset, checkPlacement,
-    rotateShape, holdShape, holdCurrentShape, rotateHoldShape, rerollHand, rerollsUsed 
+    rotateShape, holdShape, holdCurrentShape, rotateHoldShape, rerollHand, rerollsUsed,
+    destroyCell
   } = useBlockBlast();
   const { 
     coins, addCoins, classicHighScore, updateClassicHighScore, equippedSkin, equippedTrail, 
-    addXp, updateQuestProgress, soundEnabled, recordGame, inventory, consumeItem
+    addXp, updateQuestProgress, soundEnabled, recordGame, inventory, consumeItem,
+    reducedMotion, colorblindMode, screenShake, particleDensity, gridContrast, aimGuide
   } = useGameStore();
   const { fireAtElement, popRewardAtElement } = useConfetti();
   const [selectedShapeIdx, setSelectedShapeIdx] = useState<number | null>(null);
@@ -58,6 +60,8 @@ export default function Classic() {
   const [manuallyStopped, setManuallyStopped] = useState(false);
   const [paused, setPaused] = useState(false);
   const [particles, setParticles] = useState<Particle[]>([]);
+  const [shakeGrid, setShakeGrid] = useState(false);
+  const [isBlasterActive, setIsBlasterActive] = useState(false);
   const hasProcessedGameOver = useRef(false);
 
   const skin = SKINS.find((s) => s.id === equippedSkin) || SKINS[0];
@@ -129,7 +133,16 @@ export default function Classic() {
     const shapeCenterY = shapeRect.top + shapeRect.height / 2;
 
     // Spawn trail particles if active trail is equipped and has chars
-    if (activeTrail && activeTrail.type !== "none" && activeTrail.chars && activeTrail.chars.length > 0) {
+    let shouldSpawnParticle = true;
+    if (reducedMotion || particleDensity === "none") {
+      shouldSpawnParticle = false;
+    } else if (particleDensity === "low") {
+      shouldSpawnParticle = Math.random() < 0.25;
+    } else if (particleDensity === "medium") {
+      shouldSpawnParticle = Math.random() < 0.6;
+    }
+
+    if (shouldSpawnParticle && activeTrail && activeTrail.type !== "none" && activeTrail.chars && activeTrail.chars.length > 0) {
       const px = info?.point?.x ?? shapeCenterX;
       const py = info?.point?.y ?? shapeCenterY;
       const newParticle = createTrailParticle(px, py, activeTrail);
@@ -192,6 +205,13 @@ export default function Classic() {
         updateQuestProgress("lines", res.linesCleared);
         setJustClearedLines(res.linesCleared);
         sounds.playClear(soundEnabled, res.linesCleared);
+        
+        // Tremblement d'écran si combos
+        if (screenShake && !reducedMotion) {
+          setShakeGrid(true);
+          setTimeout(() => setShakeGrid(false), 400);
+        }
+        
         setTimeout(() => setJustClearedLines(0), 1000);
       } else {
         sounds.playMove(soundEnabled);
@@ -203,6 +223,37 @@ export default function Classic() {
   };
 
   const handleCellClick = (r: number, c: number) => {
+    if (isBlasterActive) {
+      if (grid[r][c] !== 0) {
+        if (destroyCell(r, c)) {
+          consumeItem('gadget_neon_blaster');
+          setIsBlasterActive(false);
+          sounds.playClear(soundEnabled, 1);
+          
+          // Particules d'explosion
+          const gridRect = gridRef.current?.getBoundingClientRect();
+          if (gridRect) {
+            const cellSize = gridRect.width / GRID_SIZE;
+            const px = gridRect.left + (c * cellSize) + (cellSize / 2);
+            const py = gridRect.top + (r * cellSize) + (cellSize / 2);
+            
+            const blastParticles = Array.from({ length: 15 }, () => ({
+              id: Math.random().toString(36).substring(7),
+              x: px + (Math.random() * 20 - 10),
+              y: py + (Math.random() * 20 - 10),
+              char: "💥",
+              color: "text-red-500 font-bold",
+              scale: Math.random() * 0.5 + 0.8,
+              rotation: Math.random() * 360,
+              driftY: Math.random() * 40 - 20,
+            }));
+            setParticles((prev) => [...prev, ...blastParticles]);
+          }
+        }
+      }
+      return;
+    }
+
     if (selectedShapeIdx === null || gameOver || manuallyStopped || paused) return;
     const res = placeShape(selectedShapeIdx, r, c);
     if (res !== false) {
@@ -213,6 +264,13 @@ export default function Classic() {
         updateQuestProgress("lines", res.linesCleared);
         setJustClearedLines(res.linesCleared);
         sounds.playClear(soundEnabled, res.linesCleared);
+        
+        // Tremblement d'écran si combos
+        if (screenShake && !reducedMotion) {
+          setShakeGrid(true);
+          setTimeout(() => setShakeGrid(false), 400);
+        }
+        
         setTimeout(() => setJustClearedLines(0), 1000);
       } else {
         sounds.playMove(soundEnabled);
@@ -379,13 +437,19 @@ export default function Classic() {
                           cell 
                             ? cn(
                                 skin.colors[holdShape.colorIdx] ?? skin.colors[0],
-                                "rounded-md shadow-[0_2px_5px_rgba(0,0,0,0.3),inset_0_1px_1px_rgba(255,255,255,0.3)]"
+                                "rounded-md shadow-[0_2px_5px_rgba(0,0,0,0.3),inset_0_1px_1px_rgba(255,255,255,0.3)]",
+                                colorblindMode === "high-contrast" && "ring-1 ring-white"
                               ) 
                             : "bg-transparent pointer-events-none"
                         )}
                       >
                         {cell === 1 && (
                           <div className="absolute top-0.5 left-0.5 right-0.5 h-[30%] bg-white/15 rounded-t-sm pointer-events-none" />
+                        )}
+                        {cell === 1 && colorblindMode === "symbols" && (
+                          <span className="absolute inset-0 flex items-center justify-center text-[7px] font-black text-slate-950 pointer-events-none select-none drop-shadow-[0_0.5px_0.5px_rgba(255,255,255,0.45)]">
+                            {["⭐", "💠", "🔺", "⚪", "🔶", "⬜", "🔸"][holdShape.colorIdx] ?? "●"}
+                          </span>
                         )}
                       </div>
                     ))
@@ -411,12 +475,29 @@ export default function Classic() {
           </div>
 
           {/* Grid Board */}
-          <div 
-            className="relative bg-slate-950/90 p-4 rounded-3xl border-2 border-slate-800/80 shadow-[0_25px_60px_rgba(0,0,0,0.85)] backdrop-blur-md"
+          <motion.div 
+            animate={shakeGrid ? {
+              x: [0, -6, 6, -6, 6, -3, 3, 0],
+              y: [0, 4, -4, 4, -4, 2, -2, 0]
+            } : {}}
+            transition={{ duration: 0.4 }}
+            className={cn(
+              "relative p-4 rounded-3xl border-2 transition-all duration-300",
+              gridContrast === "high"
+                ? "bg-slate-950 border-white/20 shadow-[0_0_40px_rgba(255,255,255,0.05)]"
+                : "bg-slate-950/90 border-slate-800/80 shadow-[0_25px_60px_rgba(0,0,0,0.85)]",
+              isBlasterActive && "ring-2 ring-red-500/40"
+            )}
             onMouseLeave={() => setHoveredCell(null)}
           >
             {/* Subtle elegant inner light reflection ring */}
             <div className="absolute inset-0 rounded-3xl border border-white/5 pointer-events-none" />
+
+            {isBlasterActive && (
+              <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-red-650 border border-red-500 text-white text-[9px] font-black font-mono px-3 py-1 rounded-full animate-bounce shadow-lg z-30 tracking-wider">
+                🔫 MODE BLASTER ACTIF : CLIQUEZ SUR UN BLOC À DÉTRUIRE
+              </div>
+            )}
 
             <div 
               ref={gridRef}
@@ -438,15 +519,28 @@ export default function Classic() {
                         : (isFilled ? cellColor : "bg-red-500/20 border border-red-500/40 shadow-[inset_0_0_10px_rgba(239,68,68,0.5)]"))
                     : (isFilled ? cellColor : "bg-slate-950/45 border border-white/[0.02] shadow-[inset_0_2px_4px_rgba(0,0,0,0.7)]");
 
+                  const shape = selectedShapeIdx !== null && (selectedShapeIdx === 999 ? holdShape : hand[selectedShapeIdx])
+                    ? (selectedShapeIdx === 999 ? holdShape.shape : hand[selectedShapeIdx].shape)
+                    : null;
+                  const isRowInGuide = aimGuide && hoveredCell && shape && (r >= hoveredCell.r && r < hoveredCell.r + shape.length);
+                  const isColInGuide = aimGuide && hoveredCell && shape && (c >= hoveredCell.c && c < hoveredCell.c + shape[0].length);
+                  
+                  const guideClass = (isRowInGuide || isColInGuide) && !isFilled && !isPreview
+                    ? "bg-cyan-500/[0.03] ring-1 ring-cyan-500/10 ring-inset"
+                    : "";
+
                   return (
                     <div
                       key={`${r}-${c}`}
                       className={cn(
                         "w-8 h-8 sm:w-10 sm:h-10 md:w-11 md:h-11 rounded-lg transition-all duration-100 relative flex items-center justify-center overflow-hidden",
                         cellColorClass,
+                        guideClass,
                         isFilled && "shadow-[0_4px_10px_rgba(0,0,0,0.4),inset_0_1.5px_1.5px_rgba(255,255,255,0.35)] active:scale-95",
+                        isFilled && colorblindMode === "high-contrast" && "ring-2 ring-white",
                         isPreview && isPlacementValid && "opacity-80 scale-95 ring-2 ring-cyan-400 ring-offset-2 ring-offset-slate-950 shadow-[0_0_15px_rgba(34,211,238,0.4)] z-10",
-                        isPreview && !isPlacementValid && isFilled && "ring-2 ring-red-500 ring-offset-2 ring-offset-slate-950 z-10 animate-pulse"
+                        isPreview && !isPlacementValid && isFilled && "ring-2 ring-red-500 ring-offset-2 ring-offset-slate-950 z-10 animate-pulse",
+                        isBlasterActive && isFilled && "hover:ring-2 hover:ring-red-500 hover:scale-105 cursor-crosshair z-10"
                       )}
                       onMouseEnter={() => setHoveredCell({ r, c })}
                       onClick={() => handleCellClick(r, c)}
@@ -454,8 +548,13 @@ export default function Classic() {
                       {isFilled && (
                         <div className="absolute top-0.5 left-0.5 right-0.5 h-[30%] bg-white/15 rounded-t-md pointer-events-none" />
                       )}
-                      {isFilled && skin.id === "hacker" && (
+                      {isFilled && skin.id === "hacker" && colorblindMode !== "symbols" && (
                         <span className="flex items-center justify-center w-full h-full text-[9px] font-mono opacity-60 text-green-300">01</span>
+                      )}
+                      {isFilled && colorblindMode === "symbols" && (
+                        <span className="absolute inset-0 flex items-center justify-center text-sm font-black text-slate-950 pointer-events-none select-none drop-shadow-[0_1px_1px_rgba(255,255,255,0.45)]">
+                          {["⭐", "💠", "🔺", "⚪", "🔶", "⬜", "🔸"][cell - 1] ?? "●"}
+                        </span>
                       )}
                     </div>
                   );
@@ -586,7 +685,7 @@ export default function Classic() {
                 </button>
               </motion.div>
             )}
-          </div>
+          </motion.div>
         </div>
 
         {/* Hand (Available Shapes) */}
@@ -629,13 +728,19 @@ export default function Classic() {
                                 cell 
                                   ? cn(
                                       skin.colors[shapeObj.colorIdx] ?? skin.colors[0],
-                                      "rounded-md shadow-[0_2px_5px_rgba(0,0,0,0.3),inset_0_1px_1px_rgba(255,255,255,0.3)]"
+                                      "rounded-md shadow-[0_2px_5px_rgba(0,0,0,0.3),inset_0_1px_1px_rgba(255,255,255,0.3)]",
+                                      colorblindMode === "high-contrast" && "ring-1 ring-white"
                                     ) 
                                   : "bg-transparent pointer-events-none"
                               )}
                             >
                               {cell === 1 && (
                                 <div className="absolute top-0.5 left-0.5 right-0.5 h-[30%] bg-white/15 rounded-t-sm pointer-events-none" />
+                              )}
+                              {cell === 1 && colorblindMode === "symbols" && (
+                                <span className="absolute inset-0 flex items-center justify-center text-[7px] md:text-[9px] font-black text-slate-950 pointer-events-none select-none drop-shadow-[0_0.5px_0.5px_rgba(255,255,255,0.45)]">
+                                  {["⭐", "💠", "🔺", "⚪", "🔶", "⬜", "🔸"][shapeObj.colorIdx] ?? "●"}
+                                </span>
                               )}
                             </div>
                           ))
@@ -711,15 +816,15 @@ export default function Classic() {
             ))}
           </div>
 
-          {/* Reroll prestige button */}
-          <div className="w-full border-t border-white/5 pt-4 flex justify-center">
+          {/* Reroll prestige button & Neon Blaster */}
+          <div className="w-full border-t border-white/5 pt-4 flex flex-wrap justify-center gap-3">
             {inventory.filter(id => id === 'gadget_reroll').length > 0 ? (
               <button
                 onClick={handleReroll}
                 disabled={coins < 50 || gameOver}
                 className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-yellow-500/10 to-amber-600/10 hover:from-yellow-500/20 hover:to-amber-600/20 border border-yellow-500/30 text-yellow-500 disabled:opacity-40 disabled:pointer-events-none rounded-xl text-xs font-bold font-mono tracking-wide transition-all shadow-[0_4px_10px_rgba(234,179,8,0.05)] active:scale-95"
               >
-                <RefreshCw className="w-3.5 h-3.5" />
+                <RefreshCw className="w-3.5 h-3.5 animate-spin-slow" />
                 REROLL ({inventory.filter(i => i === 'gadget_reroll').length}) - 50 SP
               </button>
             ) : (
@@ -732,6 +837,36 @@ export default function Classic() {
               >
                 <Lock className="w-3.5 h-3.5 text-slate-500" />
                 REROLL ÉPUISÉ
+              </button>
+            )}
+
+            {inventory.filter(id => id === 'gadget_neon_blaster').length > 0 ? (
+              <button
+                onClick={() => {
+                  sounds.playClick(soundEnabled);
+                  setIsBlasterActive(!isBlasterActive);
+                }}
+                disabled={gameOver}
+                className={cn(
+                  "flex items-center gap-2 px-4 py-2 border rounded-xl text-xs font-bold font-mono tracking-wide transition-all active:scale-95 shadow-md",
+                  isBlasterActive
+                    ? "bg-red-500 border-red-400 text-slate-950 animate-pulse shadow-[0_0_15px_rgba(239,68,68,0.4)]"
+                    : "bg-red-500/10 hover:bg-red-500/20 border-red-500/30 text-red-400"
+                )}
+              >
+                <span className="text-sm">🔫</span>
+                BLASTER NÉON ({inventory.filter(i => i === 'gadget_neon_blaster').length})
+              </button>
+            ) : (
+              <button
+                onClick={() => {
+                  sounds.playClick(soundEnabled);
+                  alert("Débloquez le gadget 'Blaster Néon' via le Snob Pass ou dans la boutique pour détruire des blocs ! 🔓");
+                }}
+                className="flex items-center gap-2 px-4 py-2 bg-slate-950 border border-dashed border-slate-850 text-slate-650 rounded-xl text-xs font-bold font-mono tracking-wide cursor-not-allowed hover:bg-red-950/20 hover:border-red-900/40 hover:text-red-400 transition-all"
+              >
+                <Lock className="w-3.5 h-3.5 text-slate-500" />
+                BLASTER ÉPUISÉ
               </button>
             )}
           </div>

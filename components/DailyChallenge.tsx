@@ -1,16 +1,15 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
-import { useBlockBlast, GRID_SIZE } from "@/lib/blockBlast";
+import { useDailyChallenge } from "@/lib/dailyChallenge";
+import { GRID_SIZE } from "@/lib/blockBlast";
 import { useGameStore } from "@/lib/store";
 import { SKINS } from "@/lib/skins";
 import { TRAILS } from "@/lib/trails";
-import { RotateCcw, Zap, AlertTriangle, Play, Pause, CheckCircle2, RotateCw, RefreshCw, Archive, Lock, Trophy, Sparkles } from "lucide-react";
+import { RotateCcw, Trophy, CheckCircle2, Sparkles, RotateCw, RefreshCw, Archive, Lock, Pause, Play } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "motion/react";
 import { sounds } from "@/lib/audio";
 import { useConfetti } from "@/components/ConfettiProvider";
-
-const BLITZ_DURATION = 120; // 2 minutes in seconds
 
 interface Particle {
   id: string;
@@ -43,131 +42,79 @@ function createTrailParticle(
   };
 }
 
-export default function Blitz() {
+export default function DailyChallenge() {
   const { 
     grid, hand, score, gameOver, placeShape, reset, checkPlacement,
-    rotateShape, holdShape, holdCurrentShape, rotateHoldShape, rerollHand,
-    destroyCell
-  } = useBlockBlast();
+    blocksRemaining, dailyDate, completed, bestScore
+  } = useDailyChallenge();
   
+  const holdShape: any = null;
+  const rerollHand = () => {};
+  const rotateHoldShape = () => {};
+  const rotateShape = (idx: number) => {};
+  const holdCurrentShape = (idx: number) => {};
   const { 
-    coins, addCoins, equippedSkin, equippedTrail, 
+    coins, addCoins, classicHighScore, updateClassicHighScore, equippedSkin, equippedTrail, 
     addXp, updateQuestProgress, soundEnabled, recordGame, inventory, consumeItem,
     reducedMotion, colorblindMode, screenShake, particleDensity, gridContrast, aimGuide
   } = useGameStore();
-
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [paused, setPaused] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(BLITZ_DURATION);
-  const [timeExpired, setTimeExpired] = useState(false);
-  const audioCtxRef = useRef<AudioContext | null>(null);
-  const hasProcessedGameOver = useRef(false);
   const { fireAtElement, popRewardAtElement } = useConfetti();
-
   const [selectedShapeIdx, setSelectedShapeIdx] = useState<number | null>(null);
   const [hoveredCell, setHoveredCell] = useState<{ r: number; c: number } | null>(null);
   const [justClearedLines, setJustClearedLines] = useState(0);
   const [currentComboMultiplier, setCurrentComboMultiplier] = useState(1);
+  const [manuallyStopped, setManuallyStopped] = useState(false);
+  const [paused, setPaused] = useState(false);
   const [particles, setParticles] = useState<Particle[]>([]);
   const [shakeGrid, setShakeGrid] = useState(false);
   const [isBlasterActive, setIsBlasterActive] = useState(false);
-  const [isTimeFrozen, setIsTimeFrozen] = useState(false);
+  const hasProcessedGameOver = useRef(false);
 
   const skin = SKINS.find((s) => s.id === equippedSkin) || SKINS[0];
   const activeTrail = TRAILS.find((t) => t.id === equippedTrail) || TRAILS[0];
   const gridRef = useRef<HTMLDivElement>(null);
 
-  const isActuallyGameOver = gameOver || timeExpired;
-
-  // Initialize Audio Context on first interaction
-  const initAudio = () => {
-    if (!audioCtxRef.current) {
-      audioCtxRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
-    }
-  };
-
-  const playAlarm = () => {
-    if (!audioCtxRef.current) return;
-    const ctx = audioCtxRef.current;
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    
-    osc.type = "square";
-    osc.frequency.setValueAtTime(440, ctx.currentTime);
-    osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.1);
-    
-    gain.gain.setValueAtTime(0.1, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
-    
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-    
-    osc.start();
-    osc.stop(ctx.currentTime + 0.3);
-  };
-
-  // Timer logic
+  // Update high score & grant rewards on game over
   useEffect(() => {
-    let interval: NodeJS.Timeout;
-    if (isPlaying && !isActuallyGameOver && !paused) {
-      interval = setInterval(() => {
-        setTimeLeft((prev) => {
-          if (isTimeFrozen) return prev;
-          if (prev <= 1) {
-            setTimeExpired(true);
-            setIsPlaying(false);
-            return 0;
-          }
-          if (prev <= 11) {
-            playAlarm();
-          }
-          return prev - 1;
-        });
-      }, 1000);
+    if (gameOver && !manuallyStopped && !hasProcessedGameOver.current) {
+      hasProcessedGameOver.current = true;
+      updateClassicHighScore(score);
+      addCoins(Math.floor(score / 500));
+      addXp(Math.floor(score / 10));
+      updateQuestProgress("play", 1);
+      updateQuestProgress("score", score);
+      sounds.playGameOver(soundEnabled);
+      recordGame(score, "daily");
+      fireAtElement(gridRef.current, { count: 70 });
+      popRewardAtElement(`+${Math.floor(score / 500)} SP · +${Math.floor(score / 10)} XP`, "#facc15", gridRef.current, "🪙");
+    } else if (!gameOver) {
+      hasProcessedGameOver.current = false;
     }
-    return () => clearInterval(interval);
-  }, [isPlaying, isActuallyGameOver, paused, isTimeFrozen]);
+  }, [gameOver, score, updateClassicHighScore, addCoins, addXp, updateQuestProgress, manuallyStopped, soundEnabled, recordGame, fireAtElement, popRewardAtElement]);
 
   // Escape to pause / resume
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && isPlaying && !isActuallyGameOver) {
+      if (e.key === "Escape" && !gameOver && !manuallyStopped) {
         setPaused((p) => !p);
       }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [isPlaying, isActuallyGameOver]);
+  }, [gameOver, manuallyStopped]);
 
-  // Update quests & rewards on game over
-  useEffect(() => {
-    if (isActuallyGameOver && !hasProcessedGameOver.current && (score > 0 || isPlaying === false)) {
-      hasProcessedGameOver.current = true;
-      updateQuestProgress("blitz_played", 1);
-      updateQuestProgress("score", score);
-      addXp(Math.floor(score / 10));
-      addCoins(Math.floor(score / 500));
-      sounds.playGameOver(soundEnabled);
-      recordGame(score, "blitz");
-      fireAtElement(gridRef.current, { count: 70 });
-      popRewardAtElement(`+${Math.floor(score / 500)} SP · +${Math.floor(score / 10)} XP`, "#facc15", gridRef.current, "⚡");
-    } else if (!isActuallyGameOver) {
-      hasProcessedGameOver.current = false;
-    }
-  }, [isActuallyGameOver, score, updateQuestProgress, addXp, addCoins, soundEnabled, recordGame, isPlaying, fireAtElement, popRewardAtElement]);
-
-  const handleStart = () => {
-    sounds.playClick(soundEnabled);
-    initAudio();
-    reset();
-    setTimeLeft(BLITZ_DURATION);
-    setTimeExpired(false);
-    setIsPlaying(true);
-    hasProcessedGameOver.current = false;
+  const handleStop = () => {
+    if (gameOver || manuallyStopped || score === 0 || paused) return;
+    updateClassicHighScore(score);
+    addCoins(Math.floor(score / 500));
+    addXp(Math.floor(score / 10));
+    updateQuestProgress("play", 1);
+    updateQuestProgress("score", score);
+    setManuallyStopped(true);
   };
 
   const handleReroll = () => {
-    if (coins >= 50 && !gameOver && isPlaying) {
+    if (coins >= 50 && !gameOver) {
       if (consumeItem('gadget_reroll')) {
         addCoins(-50);
         rerollHand();
@@ -176,42 +123,8 @@ export default function Blitz() {
     }
   };
 
-  const processPlacement = (res: any) => {
-    if (res !== false) {
-      setSelectedShapeIdx(null);
-      setHoveredCell(null);
-      setCurrentComboMultiplier(res.comboMultiplier || 1);
-      if (res.linesCleared > 0) {
-        updateQuestProgress("lines", res.linesCleared);
-        if (res.linesCleared >= 2) {
-          updateQuestProgress("doubles", 1);
-        }
-        setJustClearedLines(res.linesCleared);
-        sounds.playClear(soundEnabled, res.linesCleared);
-        
-        // Tremblement d'écran si combos
-        if (screenShake && !reducedMotion) {
-          setShakeGrid(true);
-          setTimeout(() => setShakeGrid(false), 400);
-        }
-        
-        // Add time for lines cleared
-        if (isPlaying) {
-          setTimeLeft((prev) => Math.min(prev + (res.linesCleared * 2), BLITZ_DURATION));
-        }
-        
-        setTimeout(() => setJustClearedLines(0), 1000);
-      } else {
-        sounds.playMove(soundEnabled);
-      }
-    } else {
-      setHoveredCell(null);
-      setSelectedShapeIdx(null);
-    }
-  };
-
   const handleDrag = (e: any, info: any, shapeIdx: number) => {
-    if (!gridRef.current || isActuallyGameOver || !isPlaying || paused) return;
+    if (!gridRef.current || gameOver || manuallyStopped || paused) return;
     const shapeObj = shapeIdx === 999 ? holdShape : hand[shapeIdx];
     if (!shapeObj || shapeObj.used) return;
 
@@ -263,7 +176,7 @@ export default function Blitz() {
   };
 
   const handleDragEnd = (e: any, info: any, shapeIdx: number) => {
-    if (!gridRef.current || isActuallyGameOver || !isPlaying || paused) return;
+    if (!gridRef.current || gameOver || manuallyStopped || paused) return;
     const shapeObj = shapeIdx === 999 ? holdShape : hand[shapeIdx];
     if (!shapeObj || shapeObj.used) return;
 
@@ -290,44 +203,54 @@ export default function Blitz() {
     const r = Math.round(exactR);
 
     const res = placeShape(shapeIdx, r, c);
-    processPlacement(res);
+    if (res !== false) {
+      setSelectedShapeIdx(null);
+      setHoveredCell(null);
+      setCurrentComboMultiplier(res.comboMultiplier || 1);
+      if (res.linesCleared > 0) {
+        updateQuestProgress("lines", res.linesCleared);
+        setJustClearedLines(res.linesCleared);
+        sounds.playClear(soundEnabled, res.linesCleared);
+        
+        // Tremblement d'écran si combos
+        if (screenShake && !reducedMotion) {
+          setShakeGrid(true);
+          setTimeout(() => setShakeGrid(false), 400);
+        }
+        
+        setTimeout(() => setJustClearedLines(0), 1000);
+      } else {
+        sounds.playMove(soundEnabled);
+      }
+    } else {
+      setHoveredCell(null);
+      setSelectedShapeIdx(null);
+    }
   };
 
   const handleCellClick = (r: number, c: number) => {
-    if (isBlasterActive) {
-      if (grid[r][c] !== 0) {
-        if (destroyCell(r, c)) {
-          consumeItem('gadget_neon_blaster');
-          setIsBlasterActive(false);
-          sounds.playClear(soundEnabled, 1);
-          
-          // Particules d'explosion
-          const gridRect = gridRef.current?.getBoundingClientRect();
-          if (gridRect) {
-            const cellSize = gridRect.width / GRID_SIZE;
-            const px = gridRect.left + (c * cellSize) + (cellSize / 2);
-            const py = gridRect.top + (r * cellSize) + (cellSize / 2);
-            
-            const blastParticles = Array.from({ length: 15 }, () => ({
-              id: Math.random().toString(36).substring(7),
-              x: px + (Math.random() * 20 - 10),
-              y: py + (Math.random() * 20 - 10),
-              char: "💥",
-              color: "text-red-500 font-bold",
-              scale: Math.random() * 0.5 + 0.8,
-              rotation: Math.random() * 360,
-              driftY: Math.random() * 40 - 20,
-            }));
-            setParticles((prev) => [...prev, ...blastParticles]);
-          }
-        }
-      }
-      return;
-    }
-
-    if (selectedShapeIdx === null || isActuallyGameOver || !isPlaying || paused) return;
+    if (selectedShapeIdx === null || gameOver || manuallyStopped || paused) return;
     const res = placeShape(selectedShapeIdx, r, c);
-    processPlacement(res);
+    if (res !== false) {
+      setSelectedShapeIdx(null);
+      setHoveredCell(null);
+      setCurrentComboMultiplier(res.comboMultiplier || 1);
+      if (res.linesCleared > 0) {
+        updateQuestProgress("lines", res.linesCleared);
+        setJustClearedLines(res.linesCleared);
+        sounds.playClear(soundEnabled, res.linesCleared);
+        
+        // Tremblement d'écran si combos
+        if (screenShake && !reducedMotion) {
+          setShakeGrid(true);
+          setTimeout(() => setShakeGrid(false), 400);
+        }
+        
+        setTimeout(() => setJustClearedLines(0), 1000);
+      } else {
+        sounds.playMove(soundEnabled);
+      }
+    }
   };
 
   const isPlacementValid = selectedShapeIdx !== null && hoveredCell !== null
@@ -348,40 +271,16 @@ export default function Blitz() {
     ? renderShapePreview(selectedShapeIdx === 999 ? holdShape.shape : hand[selectedShapeIdx].shape, hoveredCell.r, hoveredCell.c)
     : [];
 
-  const formatTime = (seconds: number) => {
-    const m = Math.floor(seconds / 60);
-    const s = seconds % 60;
-    return `${m}:${s.toString().padStart(2, "0")}`;
-  };
-
-  const isCritical = timeLeft <= 10 && isPlaying;
-
   return (
     <div className="h-full flex flex-col lg:flex-row items-center justify-center gap-8 xl:gap-12 p-8 pt-16 lg:pt-8 overflow-y-auto">
       
       {/* Game Stats Panel */}
       <div className="flex flex-col gap-6 w-64 lg:order-1 order-2">
         <div className="mb-4">
-          <h2 className="text-4xl font-black font-mono tracking-tighter uppercase text-fuchsia-500 mb-1 flex items-center gap-2">
-            <Zap className="w-8 h-8" /> BLITZ
+          <h2 className="text-4xl font-black font-mono tracking-tighter uppercase mb-1 bg-gradient-to-r from-yellow-400 via-amber-300 to-yellow-600 text-transparent bg-clip-text">
+            CLASSIQUE
           </h2>
-          <p className="text-xs text-slate-400 font-mono">+2 sec par ligne</p>
-        </div>
-
-        <div className={cn(
-          "p-6 rounded-2xl border-2 transition-colors relative overflow-hidden",
-          isCritical ? "bg-red-500/20 border-red-500 animate-flash shadow-[0_0_30px_rgba(239,68,68,0.4)]" : "bg-slate-900 border-white/10 shadow-[0_4px_20px_rgba(0,0,0,0.3)]"
-        )}>
-          <div className="text-xs text-slate-500 uppercase tracking-widest font-bold mb-1 flex items-center gap-2">
-            Temps restant
-            {isCritical && <AlertTriangle className="w-4 h-4 text-red-500" />}
-          </div>
-          <div className={cn(
-            "text-5xl font-black font-mono tabular-nums",
-            isCritical ? "text-red-500" : "text-white"
-          )}>
-            {formatTime(timeLeft)}
-          </div>
+          <p className="text-xs text-slate-400 font-mono">Pas de chrono, pur puzzle prestige</p>
         </div>
 
         <div className="p-6 rounded-2xl bg-slate-900 border-2 border-white/10 relative overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.3)]">
@@ -413,127 +312,62 @@ export default function Blitz() {
             )}
           </AnimatePresence>
         </div>
+        
+        <div className="p-6 rounded-2xl bg-slate-900 border-2 border-white/10 shadow-[0_4px_20px_rgba(0,0,0,0.3)]">
+          <div className="text-xs text-slate-500 uppercase tracking-widest font-bold mb-1 flex items-center gap-2">
+            Meilleur Score <Trophy className="w-4 h-4 text-yellow-500 animate-pulse" />
+          </div>
+          <div className="text-3xl font-bold font-mono tabular-nums text-yellow-500">
+            {Math.max(score, classicHighScore).toLocaleString()}
+          </div>
+        </div>
 
         <div className="grid grid-cols-1 gap-3">
-          {!isPlaying && !isActuallyGameOver ? (
-            <button
-              onClick={handleStart}
-              className="flex items-center justify-center gap-3 px-6 py-4 bg-fuchsia-600 hover:bg-fuchsia-500 text-white border border-fuchsia-400 rounded-xl font-bold transition-all hover:scale-105 active:scale-95 shadow-lg"
-            >
-              <Play className="w-5 h-5 text-white" /> START BLITZ
-            </button>
-          ) : isActuallyGameOver ? (
-            <button
-              onClick={handleStart}
-              className="flex items-center justify-center gap-3 px-6 py-4 bg-fuchsia-600 hover:bg-fuchsia-500 text-white border border-fuchsia-400 rounded-xl font-bold transition-all hover:scale-105 active:scale-95 shadow-lg"
-            >
-              <RotateCcw className="w-5 h-5" /> REJOUER
-            </button>
-          ) : (
-            <>
-              <button
-                onClick={() => {
-                  sounds.playClick(soundEnabled);
-                  setPaused((p) => !p);
-                }}
-                className="flex items-center justify-center gap-3 px-6 py-4 bg-blue-500/10 hover:bg-blue-500/20 text-blue-300 border border-blue-500/20 rounded-xl font-bold transition-all hover:scale-105 active:scale-95"
-              >
-                {paused ? <Play className="w-5 h-5" /> : <Pause className="w-5 h-5" />}
-                {paused ? "REPRENDRE" : "PAUSE"}
-              </button>
-              <button
-                onClick={() => {
-                  sounds.playClick(soundEnabled);
-                  setIsPlaying(false);
-                  setTimeExpired(true);
-                }}
-                className="flex items-center justify-center gap-3 px-6 py-4 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 rounded-xl font-bold transition-all hover:scale-105 active:scale-95"
-              >
-                <RotateCcw className="w-5 h-5" /> ABANDONNER
-              </button>
-            </>
-          )}
+          <button
+            onClick={() => {
+              sounds.playClick(soundEnabled);
+              reset();
+              setManuallyStopped(false);
+              setPaused(false);
+            }}
+            className="flex items-center justify-center gap-3 px-6 py-4 bg-white/5 hover:bg-white/10 text-white border border-white/5 rounded-xl font-bold transition-all hover:scale-105 active:scale-95"
+          >
+            <RotateCcw className="w-5 h-5 text-fuchsia-400" /> REJOUER
+          </button>
+
+          <button
+            onClick={() => {
+              sounds.playClick(soundEnabled);
+              setPaused((p) => !p);
+            }}
+            disabled={gameOver || manuallyStopped}
+            className="flex items-center justify-center gap-3 px-6 py-4 bg-blue-500/10 hover:bg-blue-500/20 text-blue-300 border border-blue-500/20 disabled:opacity-30 disabled:cursor-not-allowed rounded-xl font-bold transition-all hover:scale-105 active:scale-95 relative overflow-hidden"
+          >
+            {paused ? <Play className="w-5 h-5" /> : <Pause className="w-5 h-5" />}
+            {paused ? "REPRENDRE" : "PAUSE"}
+          </button>
+
+          <button
+            onClick={() => {
+              sounds.playClick(soundEnabled);
+              handleStop();
+            }}
+            disabled={score === 0 || gameOver || manuallyStopped}
+            className="flex items-center justify-center gap-3 px-6 py-4 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 disabled:opacity-30 disabled:cursor-not-allowed rounded-xl font-bold transition-all hover:scale-105 active:scale-95 shadow-[0_4px_12px_rgba(239,68,68,0.1)] relative overflow-hidden"
+          >
+            {score > 0 && !gameOver && !manuallyStopped && !paused && (
+              <span className="absolute left-4 w-2 h-2 bg-red-500 rounded-full animate-ping" />
+            )}
+            STOP & RÉCUPÉRER
+          </button>
         </div>
       </div>
 
       {/* Main Board & Hand & Hold */}
-      <div className="flex flex-col items-center gap-6 lg:order-2 order-1 w-full max-w-2xl relative">
-        {paused && !isActuallyGameOver && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="absolute inset-0 z-30 flex flex-col items-center justify-center bg-slate-950/80 backdrop-blur-md rounded-3xl p-8"
-          >
-            <motion.div
-              animate={{ scale: [1, 1.1, 1] }}
-              transition={{ repeat: Infinity, duration: 2 }}
-              className="w-20 h-20 bg-blue-500/10 text-blue-300 border border-blue-500/30 rounded-full flex items-center justify-center mb-5 shadow-[0_0_30px_rgba(59,130,246,0.35)]"
-            >
-              <Pause className="w-10 h-10" />
-            </motion.div>
-            <h3 className="text-4xl font-black text-blue-300 mb-2 tracking-tight">PAUSE</h3>
-            <p className="text-slate-400 mb-6 text-sm font-mono">Le chrono est en pause. Reprenez quand vous voulez.</p>
-            <button
-              onClick={() => {
-                sounds.playClick(soundEnabled);
-                setPaused(false);
-              }}
-              className="flex items-center gap-3 px-8 py-4 bg-blue-600 hover:bg-blue-500 text-white rounded-full font-bold text-lg transition-transform hover:scale-105 active:scale-95 shadow-[0_0_20px_rgba(37,99,235,0.5)]"
-            >
-              <Play className="w-5 h-5" /> REPRENDRE
-            </button>
-          </motion.div>
-        )}
-
-        {!isPlaying && !paused && (
-          <div className="absolute inset-0 z-30 flex flex-col items-center justify-center bg-slate-950/80 backdrop-blur-sm rounded-3xl p-8">
-            {isActuallyGameOver ? (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="flex flex-col items-center"
-              >
-                <motion.div
-                  initial={{ scale: 0, rotate: -30 }}
-                  animate={{ scale: 1, rotate: 0 }}
-                  transition={{ type: "spring", stiffness: 260, damping: 18, delay: 0.1 }}
-                  className="w-20 h-20 bg-red-500/10 text-red-400 border border-red-500/30 rounded-full flex items-center justify-center mb-5 shadow-[0_0_30px_rgba(239,68,68,0.35)]"
-                >
-                  <Trophy className="w-10 h-10" />
-                </motion.div>
-                <h3 className="text-4xl font-black text-red-400 mb-1 tracking-tight drop-shadow-[0_0_15px_rgba(239,68,68,0.5)]">
-                  {timeExpired ? "Temps Écoulé !" : "Plus de coups!"}
-                </h3>
-                <p className="text-slate-300 mb-2">Score final : <span className="font-mono text-cyan-400 text-2xl font-bold">{score.toLocaleString()}</span></p>
-                <div className="flex gap-4 mb-6 text-sm font-mono bg-slate-900 px-5 py-3 rounded-2xl border border-white/10 shadow-inner">
-                  <span className="text-yellow-400 font-bold flex items-center gap-1"><span className="w-3.5 h-3.5 rounded-full bg-yellow-500 text-slate-950 flex items-center justify-center font-black text-[8px]">SP</span>+{Math.floor(score / 500)} SP</span>
-                  <span className="text-slate-500">|</span>
-                  <span className="text-cyan-400 font-bold flex items-center gap-1"><Sparkles className="w-3.5 h-3.5" />+{Math.floor(score / 10)} XP</span>
-                </div>
-                <button
-                  onClick={handleStart}
-                  className="flex items-center gap-3 px-8 py-4 bg-fuchsia-600 hover:bg-fuchsia-500 text-white rounded-full font-bold text-lg transition-transform hover:scale-105 active:scale-95 shadow-[0_0_20px_rgba(217,70,239,0.5)]"
-                >
-                  <RotateCcw className="w-5 h-5" /> REJOUER
-                </button>
-              </motion.div>
-            ) : (
-              <div className="flex flex-col items-center">
-                <Zap className="w-16 h-16 text-fuchsia-500 mb-4 animate-pulse" />
-                <h3 className="text-3xl font-black text-white mb-2 tracking-tight">PRÊT POUR LE BLITZ ?</h3>
-                <p className="text-slate-400 mb-8 max-w-sm text-center">Vous avez 2 minutes pour faire un maximum de points. Chaque ligne complétée vous donne +2 secondes !</p>
-                <button
-                  onClick={handleStart}
-                  className="flex items-center gap-3 px-8 py-4 bg-fuchsia-600 hover:bg-fuchsia-500 text-white rounded-full font-bold text-lg transition-transform hover:scale-105 active:scale-95 shadow-[0_0_20px_rgba(217,70,239,0.5)]"
-                >
-                  <Play className="w-5 h-5" /> JOUER MAINTENANT
-                </button>
-              </div>
-            )}
-          </div>
-        )}
-
+      <div className="flex flex-col items-center gap-6 lg:order-2 order-1 w-full max-w-2xl">
+        
         <div className="flex flex-col sm:flex-row items-center justify-center gap-6 w-full">
+          
           {/* Reserve (Hold) Panel */}
           <div className="flex flex-col items-center gap-3 p-4 bg-slate-900/60 border border-white/5 rounded-2xl w-36 sm:w-40 backdrop-blur-sm shrink-0 shadow-lg relative overflow-hidden">
             {inventory.filter(id => id === 'gadget_hold').length === 0 && (
@@ -556,7 +390,7 @@ export default function Blitz() {
             >
               {holdShape ? (
                 <motion.div
-                  drag={isPlaying && !paused}
+                  drag={!gameOver && !manuallyStopped && !paused}
                   dragSnapToOrigin
                   onDragStart={() => sounds.playClick(soundEnabled)}
                   onDrag={(e, info) => handleDrag(e, info, 999)}
@@ -565,7 +399,6 @@ export default function Blitz() {
                   className="drag-shape grid gap-[1px] cursor-grab active:cursor-grabbing relative z-10"
                   style={{ gridTemplateColumns: `repeat(${holdShape.shape[0].length}, minmax(0, 1fr))` }}
                   onClick={() => {
-                    if (!isPlaying) return;
                     sounds.playClick(soundEnabled);
                     setSelectedShapeIdx(999 === selectedShapeIdx ? null : 999);
                   }}
@@ -609,8 +442,7 @@ export default function Blitz() {
                     rotateHoldShape();
                   }
                 }}
-                disabled={!isPlaying}
-                className="text-[10px] bg-slate-800 hover:bg-slate-700 text-slate-300 font-mono font-bold px-2 py-1.5 rounded-lg border border-white/5 flex items-center gap-1 transition-all active:scale-95 hover:text-white disabled:opacity-50 disabled:pointer-events-none"
+                className="text-[10px] bg-slate-800 hover:bg-slate-700 text-slate-300 font-mono font-bold px-2 py-1.5 rounded-lg border border-white/5 flex items-center gap-1 transition-all active:scale-95 hover:text-white"
               >
                 <RotateCw className="w-3 h-3 text-cyan-400" /> Tourner ({inventory.filter(id => id === 'gadget_rotate').length})
               </button>
@@ -629,8 +461,7 @@ export default function Blitz() {
               gridContrast === "high"
                 ? "bg-slate-950 border-white/20 shadow-[0_0_40px_rgba(255,255,255,0.05)]"
                 : "bg-slate-950/90 border-slate-800/80 shadow-[0_25px_60px_rgba(0,0,0,0.85)]",
-              isBlasterActive && "ring-2 ring-red-500/40",
-              isTimeFrozen && "ring-4 ring-cyan-500/80 shadow-[0_0_25px_rgba(6,182,212,0.6)] border-cyan-400/80"
+              isBlasterActive && "ring-2 ring-red-500/40"
             )}
             onMouseLeave={() => setHoveredCell(null)}
           >
@@ -640,12 +471,6 @@ export default function Blitz() {
             {isBlasterActive && (
               <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-red-650 border border-red-500 text-white text-[9px] font-black font-mono px-3 py-1 rounded-full animate-bounce shadow-lg z-30 tracking-wider">
                 🔫 MODE BLASTER ACTIF : CLIQUEZ SUR UN BLOC À DÉTRUIRE
-              </div>
-            )}
-
-            {isTimeFrozen && (
-              <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-cyan-600 border border-cyan-400 text-slate-950 text-[9px] font-black font-mono px-3 py-1 rounded-full animate-pulse shadow-lg z-30 tracking-wider flex items-center gap-1">
-                ❄️ TEMPS GELÉ (5S)
               </div>
             )}
 
@@ -711,6 +536,130 @@ export default function Blitz() {
                 })
               )}
             </div>
+
+            {gameOver && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="absolute inset-0 bg-slate-950/80 backdrop-blur-sm flex flex-col items-center justify-center rounded-xl p-8 text-center z-20"
+              >
+                <motion.div
+                  initial={{ scale: 0, rotate: -30 }}
+                  animate={{ scale: 1, rotate: 0 }}
+                  transition={{ type: "spring", stiffness: 260, damping: 18, delay: 0.1 }}
+                  className="w-20 h-20 bg-red-500/10 text-red-400 border border-red-500/30 rounded-full flex items-center justify-center mb-5 shadow-[0_0_30px_rgba(239,68,68,0.35)]"
+                >
+                  <Trophy className="w-10 h-10" />
+                </motion.div>
+                <motion.h3
+                  initial={{ y: 15, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ delay: 0.2 }}
+                  className="text-4xl font-black text-red-400 mb-1 tracking-tight drop-shadow-[0_0_15px_rgba(239,68,68,0.5)]"
+                >
+                  PARTIE TERMINÉE
+                </motion.h3>
+                <motion.p
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.3 }}
+                  className="text-slate-300 mb-2"
+                >
+                  Score final : <span className="font-mono text-cyan-400 text-2xl font-bold">{score.toLocaleString()}</span>
+                </motion.p>
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.4 }}
+                  className="flex gap-4 mb-6 text-sm font-mono bg-slate-900 px-5 py-3 rounded-2xl border border-white/10 shadow-inner"
+                >
+                  <span className="text-yellow-400 font-bold flex items-center gap-1"><span className="w-3.5 h-3.5 rounded-full bg-yellow-500 text-slate-950 flex items-center justify-center font-black text-[8px]">SP</span>+{Math.floor(score / 500)} SP</span>
+                  <span className="text-slate-500">|</span>
+                  <span className="text-cyan-400 font-bold flex items-center gap-1"><Sparkles className="w-3.5 h-3.5" />+{Math.floor(score / 10)} XP</span>
+                </motion.div>
+                <motion.button
+                  initial={{ opacity: 0, y: 15 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.5 }}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => {
+                    sounds.playClick(soundEnabled);
+                    reset();
+                    setPaused(false);
+                  }}
+                  className="flex items-center gap-3 px-8 py-4 bg-fuchsia-600 hover:bg-fuchsia-500 text-white rounded-full font-bold text-lg transition-transform shadow-[0_0_20px_rgba(217,70,239,0.5)]"
+                >
+                  <RotateCcw className="w-5 h-5" /> REJOUER
+                </motion.button>
+              </motion.div>
+            )}
+
+            {manuallyStopped && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="absolute inset-0 bg-slate-950/85 backdrop-blur-sm flex flex-col items-center justify-center rounded-2xl p-8 text-center z-20"
+              >
+                <motion.div
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ type: "spring", stiffness: 260, damping: 16, delay: 0.1 }}
+                  className="w-16 h-16 bg-green-500/10 text-green-400 border border-green-500/20 rounded-full flex items-center justify-center mb-4 shadow-[0_0_25px_rgba(34,197,94,0.3)]"
+                >
+                  <CheckCircle2 className="w-8 h-8" />
+                </motion.div>
+                <h3 className="text-3xl font-black text-green-400 mb-2 tracking-tight flex items-center justify-center gap-2">
+                  <Sparkles className="w-6 h-6 text-yellow-400 animate-pulse" />
+                  Butin Sécurisé !
+                </h3>
+                <p className="text-slate-300 mb-3 text-sm">Vous avez retiré vos gains à temps.</p>
+                <p className="text-slate-400 mb-2 text-xs font-mono uppercase tracking-wider">Score final : <span className="font-mono text-cyan-400 text-base font-bold">{score.toLocaleString()}</span></p>
+                <div className="flex gap-4 mb-6 text-sm font-mono bg-slate-900 px-5 py-2.5 rounded-2xl border border-white/5 shadow-inner">
+                  <span className="text-yellow-400 font-bold">+{Math.floor(score / 500)} SP</span>
+                  <span className="text-slate-500">|</span>
+                  <span className="text-cyan-400 font-bold">+{Math.floor(score / 10)} XP</span>
+                </div>
+                <button
+                  onClick={() => {
+                    sounds.playClick(soundEnabled);
+                    reset();
+                    setManuallyStopped(false);
+                    setPaused(false);
+                  }}
+                  className="flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-400 hover:to-green-500 text-white rounded-full font-bold text-lg transition-transform hover:scale-105 active:scale-95 shadow-[0_0_20px_rgba(16,185,129,0.4)]"
+                >
+                  <RotateCcw className="w-5 h-5" /> REJOUER
+                </button>
+              </motion.div>
+            )}
+
+            {paused && !gameOver && !manuallyStopped && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="absolute inset-0 bg-slate-950/80 backdrop-blur-md flex flex-col items-center justify-center rounded-2xl p-8 text-center z-30"
+              >
+                <motion.div
+                  animate={{ scale: [1, 1.1, 1] }}
+                  transition={{ repeat: Infinity, duration: 2 }}
+                  className="w-20 h-20 bg-blue-500/10 text-blue-300 border border-blue-500/30 rounded-full flex items-center justify-center mb-5 shadow-[0_0_30px_rgba(59,130,246,0.35)]"
+                >
+                  <Pause className="w-10 h-10" />
+                </motion.div>
+                <h3 className="text-4xl font-black text-blue-300 mb-2 tracking-tight">PAUSE</h3>
+                <p className="text-slate-400 mb-6 text-sm font-mono">La partie est en pause. Reprenez quand vous voulez.</p>
+                <button
+                  onClick={() => {
+                    sounds.playClick(soundEnabled);
+                    setPaused(false);
+                  }}
+                  className="flex items-center gap-3 px-8 py-4 bg-blue-600 hover:bg-blue-500 text-white rounded-full font-bold text-lg transition-transform hover:scale-105 active:scale-95 shadow-[0_0_20px_rgba(37,99,235,0.5)]"
+                >
+                  <Play className="w-5 h-5" /> REPRENDRE
+                </button>
+              </motion.div>
+            )}
           </motion.div>
         </div>
 
@@ -729,7 +678,7 @@ export default function Blitz() {
                   <>
                     <div className="flex-1 flex items-center justify-center">
                       <motion.div
-                        drag={isPlaying && !paused}
+                        drag={!gameOver && !manuallyStopped && !paused}
                         dragSnapToOrigin
                         onDragStart={() => sounds.playClick(soundEnabled)}
                         onDrag={(e, info) => handleDrag(e, info, idx)}
@@ -741,7 +690,6 @@ export default function Blitz() {
                         )}
                         style={{ gridTemplateColumns: `repeat(${shapeObj.shape[0].length}, minmax(0, 1fr))` }}
                         onClick={() => {
-                          if (!isPlaying) return;
                           sounds.playClick(soundEnabled);
                           setSelectedShapeIdx(idx === selectedShapeIdx ? null : idx);
                         }}
@@ -755,13 +703,19 @@ export default function Blitz() {
                                 cell 
                                   ? cn(
                                       skin.colors[shapeObj.colorIdx] ?? skin.colors[0],
-                                      "rounded-md shadow-[0_2px_5px_rgba(0,0,0,0.3),inset_0_1px_1px_rgba(255,255,255,0.3)]"
+                                      "rounded-md shadow-[0_2px_5px_rgba(0,0,0,0.3),inset_0_1px_1px_rgba(255,255,255,0.3)]",
+                                      colorblindMode === "high-contrast" && "ring-1 ring-white"
                                     ) 
                                   : "bg-transparent pointer-events-none"
                               )}
                             >
                               {cell === 1 && (
                                 <div className="absolute top-0.5 left-0.5 right-0.5 h-[30%] bg-white/15 rounded-t-sm pointer-events-none" />
+                              )}
+                              {cell === 1 && colorblindMode === "symbols" && (
+                                <span className="absolute inset-0 flex items-center justify-center text-[7px] md:text-[9px] font-black text-slate-950 pointer-events-none select-none drop-shadow-[0_0.5px_0.5px_rgba(255,255,255,0.45)]">
+                                  {["⭐", "💠", "🔺", "⚪", "🔶", "⬜", "🔸"][shapeObj.colorIdx] ?? "●"}
+                                </span>
                               )}
                             </div>
                           ))
@@ -770,19 +724,17 @@ export default function Blitz() {
                     </div>
 
                     {/* Shape Actions (Rotate, Hold) */}
-                    <div className="flex gap-1.5 mt-3 relative z-20">
+                    <div className="flex gap-1.5 mt-3">
                       {inventory.filter(id => id === 'gadget_rotate').length > 0 ? (
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
-                            if (!isPlaying) return;
                             if (consumeItem('gadget_rotate')) {
                               sounds.playClick(soundEnabled);
                               rotateShape(idx);
                             }
                           }}
-                          disabled={!isPlaying}
-                          className="p-1.5 bg-slate-800 hover:bg-slate-700 text-cyan-400 rounded-lg border border-cyan-500/20 hover:border-cyan-500/40 transition-all active:scale-90 disabled:opacity-50 disabled:pointer-events-none relative"
+                          className="p-1.5 bg-slate-800 hover:bg-slate-700 text-cyan-400 rounded-lg border border-cyan-500/20 hover:border-cyan-500/40 transition-all active:scale-90 relative"
                           title="Tourner le bloc"
                         >
                           <div className="absolute -top-1.5 -right-1.5 text-[8px] bg-cyan-500 text-slate-950 font-black px-1 rounded-full">{inventory.filter(i => i === 'gadget_rotate').length}</div>
@@ -792,12 +744,10 @@ export default function Blitz() {
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
-                            if (!isPlaying) return;
                             sounds.playClick(soundEnabled);
                             alert("Achetez le gadget 'Rotation Tactique' dans la boutique pour utiliser cette fonction ! 🔓");
                           }}
-                          disabled={!isPlaying}
-                          className="p-1.5 bg-slate-950 text-slate-600 rounded-lg border border-dashed border-slate-800 cursor-not-allowed hover:bg-red-950/20 hover:border-red-900/40 hover:text-red-400 transition-all active:scale-90 disabled:opacity-50 disabled:pointer-events-none relative"
+                          className="p-1.5 bg-slate-950 text-slate-600 rounded-lg border border-dashed border-slate-800 cursor-not-allowed hover:bg-red-950/20 hover:border-red-900/40 hover:text-red-400 transition-all active:scale-90 relative"
                           title="Rotation Épuisée"
                         >
                           <div className="absolute -top-1.5 -right-1.5 text-[8px] bg-red-500 text-white font-black px-1 rounded-full">0</div>
@@ -809,14 +759,12 @@ export default function Blitz() {
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
-                            if (!isPlaying) return;
                             if (consumeItem('gadget_hold')) {
                               sounds.playClick(soundEnabled);
                               holdCurrentShape(idx);
                             }
                           }}
-                          disabled={!isPlaying}
-                          className="p-1.5 bg-slate-800 hover:bg-slate-700 text-fuchsia-400 rounded-lg border border-fuchsia-500/20 hover:border-fuchsia-500/40 transition-all active:scale-90 disabled:opacity-50 disabled:pointer-events-none relative"
+                          className="p-1.5 bg-slate-800 hover:bg-slate-700 text-fuchsia-400 rounded-lg border border-fuchsia-500/20 hover:border-fuchsia-500/40 transition-all active:scale-90 relative"
                           title="Mettre en réserve"
                         >
                           <div className="absolute -top-1.5 -right-1.5 text-[8px] bg-fuchsia-500 text-white font-black px-1 rounded-full">{inventory.filter(i => i === 'gadget_hold').length}</div>
@@ -826,12 +774,10 @@ export default function Blitz() {
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
-                            if (!isPlaying) return;
                             sounds.playClick(soundEnabled);
                             alert("Achetez le gadget 'Case de Réserve' dans la boutique pour utiliser cette fonction ! 🔓");
                           }}
-                          disabled={!isPlaying}
-                          className="p-1.5 bg-slate-950 text-slate-600 rounded-lg border border-dashed border-slate-800 cursor-not-allowed hover:bg-red-950/20 hover:border-red-900/40 hover:text-red-400 transition-all active:scale-90 disabled:opacity-50 disabled:pointer-events-none relative"
+                          className="p-1.5 bg-slate-950 text-slate-600 rounded-lg border border-dashed border-slate-800 cursor-not-allowed hover:bg-red-950/20 hover:border-red-900/40 hover:text-red-400 transition-all active:scale-90 relative"
                           title="Réserve Épuisée"
                         >
                           <div className="absolute -top-1.5 -right-1.5 text-[8px] bg-red-500 text-white font-black px-1 rounded-full">0</div>
@@ -845,26 +791,19 @@ export default function Blitz() {
             ))}
           </div>
 
-          {/* Reroll prestige button & Neon Blaster & Time Freeze */}
+          {/* Reroll prestige button & Neon Blaster */}
           <div className="w-full border-t border-white/5 pt-4 flex flex-wrap justify-center gap-3">
             {inventory.filter(id => id === 'gadget_reroll').length > 0 ? (
-              <button
-                onClick={handleReroll}
-                disabled={coins < 50 || gameOver || !isPlaying}
-                className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-yellow-500/10 to-amber-600/10 hover:from-yellow-500/20 hover:to-amber-600/20 border border-yellow-500/30 text-yellow-500 disabled:opacity-40 disabled:pointer-events-none rounded-xl text-xs font-bold font-mono tracking-wide transition-all shadow-[0_4px_10px_rgba(234,179,8,0.05)] active:scale-95"
-              >
-                <RefreshCw className="w-3.5 h-3.5 animate-spin-slow" />
-                REROLL ({inventory.filter(i => i === 'gadget_reroll').length}) - 50 SP
-              </button>
+              <button disabled className="p-3 rounded-xl bg-slate-800/50 text-slate-500 cursor-not-allowed">
+            <RefreshCw className="w-6 h-6" />
+          </button>
             ) : (
               <button
                 onClick={() => {
-                  if (!isPlaying) return;
                   sounds.playClick(soundEnabled);
                   alert("Achetez le gadget 'Reroll de Prestige' dans la boutique pour utiliser cette fonction ! 🔓");
                 }}
-                disabled={!isPlaying}
-                className="flex items-center gap-2 px-4 py-2 bg-slate-950 border border-dashed border-slate-850 text-slate-650 rounded-xl text-xs font-bold font-mono tracking-wide cursor-not-allowed hover:bg-red-950/20 hover:border-red-900/40 hover:text-red-400 transition-all disabled:opacity-50 disabled:pointer-events-none"
+                className="flex items-center gap-2 px-4 py-2 bg-slate-950 border border-dashed border-slate-850 text-slate-650 rounded-xl text-xs font-bold font-mono tracking-wide cursor-not-allowed hover:bg-red-950/20 hover:border-red-900/40 hover:text-red-400 transition-all"
               >
                 <Lock className="w-3.5 h-3.5 text-slate-500" />
                 REROLL ÉPUISÉ
@@ -877,9 +816,9 @@ export default function Blitz() {
                   sounds.playClick(soundEnabled);
                   setIsBlasterActive(!isBlasterActive);
                 }}
-                disabled={gameOver || !isPlaying}
+                disabled={gameOver}
                 className={cn(
-                  "flex items-center gap-2 px-4 py-2 border rounded-xl text-xs font-bold font-mono tracking-wide transition-all active:scale-95 shadow-md disabled:opacity-50 disabled:pointer-events-none",
+                  "flex items-center gap-2 px-4 py-2 border rounded-xl text-xs font-bold font-mono tracking-wide transition-all active:scale-95 shadow-md",
                   isBlasterActive
                     ? "bg-red-500 border-red-400 text-slate-950 animate-pulse shadow-[0_0_15px_rgba(239,68,68,0.4)]"
                     : "bg-red-500/10 hover:bg-red-500/20 border-red-500/30 text-red-400"
@@ -891,52 +830,13 @@ export default function Blitz() {
             ) : (
               <button
                 onClick={() => {
-                  if (!isPlaying) return;
                   sounds.playClick(soundEnabled);
                   alert("Débloquez le gadget 'Blaster Néon' via le Snob Pass ou dans la boutique pour détruire des blocs ! 🔓");
                 }}
-                disabled={!isPlaying}
-                className="flex items-center gap-2 px-4 py-2 bg-slate-950 border border-dashed border-slate-850 text-slate-650 rounded-xl text-xs font-bold font-mono tracking-wide cursor-not-allowed hover:bg-red-950/20 hover:border-red-900/40 hover:text-red-400 transition-all disabled:opacity-50 disabled:pointer-events-none"
+                className="flex items-center gap-2 px-4 py-2 bg-slate-950 border border-dashed border-slate-850 text-slate-650 rounded-xl text-xs font-bold font-mono tracking-wide cursor-not-allowed hover:bg-red-950/20 hover:border-red-900/40 hover:text-red-400 transition-all"
               >
                 <Lock className="w-3.5 h-3.5 text-slate-500" />
                 BLASTER ÉPUISÉ
-              </button>
-            )}
-
-            {inventory.filter(id => id === 'gadget_time_freeze').length > 0 ? (
-              <button
-                onClick={() => {
-                  if (isPlaying && !isActuallyGameOver && !paused && !isTimeFrozen) {
-                    if (consumeItem('gadget_time_freeze')) {
-                      sounds.playClick(soundEnabled);
-                      setIsTimeFrozen(true);
-                      setTimeout(() => setIsTimeFrozen(false), 5000);
-                    }
-                  }
-                }}
-                disabled={gameOver || !isPlaying || isTimeFrozen}
-                className={cn(
-                  "flex items-center gap-2 px-4 py-2 border rounded-xl text-xs font-bold font-mono tracking-wide transition-all active:scale-95 shadow-md disabled:opacity-50 disabled:pointer-events-none",
-                  isTimeFrozen
-                    ? "bg-cyan-500 border-cyan-400 text-slate-950 animate-pulse shadow-[0_0_15px_rgba(6,182,212,0.4)]"
-                    : "bg-cyan-500/10 hover:bg-cyan-500/20 border-cyan-500/30 text-cyan-450"
-                )}
-              >
-                <span className="text-sm">⏱️</span>
-                GEL TEMPOREL ({inventory.filter(i => i === 'gadget_time_freeze').length})
-              </button>
-            ) : (
-              <button
-                onClick={() => {
-                  if (!isPlaying) return;
-                  sounds.playClick(soundEnabled);
-                  alert("Débloquez le gadget 'Gel Temporel' via le Snob Pass ou dans la boutique pour figer le chronomètre ! 🔓");
-                }}
-                disabled={!isPlaying}
-                className="flex items-center gap-2 px-4 py-2 bg-slate-950 border border-dashed border-slate-850 text-slate-650 rounded-xl text-xs font-bold font-mono tracking-wide cursor-not-allowed hover:bg-red-950/20 hover:border-red-900/40 hover:text-red-400 transition-all disabled:opacity-50 disabled:pointer-events-none"
-              >
-                <Lock className="w-3.5 h-3.5 text-slate-500" />
-                GEL ÉPUISÉ
               </button>
             )}
           </div>

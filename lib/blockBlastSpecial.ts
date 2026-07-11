@@ -2,6 +2,13 @@ import { useState, useCallback } from 'react';
 
 export const GRID_SIZE = 8;
 
+export interface CellState {
+  color: number;
+  frozen: boolean;
+  cracked: boolean;
+  bomb: boolean;
+}
+
 export const SHAPES = [
   // 1x1
   [[1]],
@@ -31,7 +38,10 @@ const getRandomShapes = () => {
   });
 };
 
-const getEmptyGrid = () => Array.from({ length: GRID_SIZE }, () => Array(GRID_SIZE).fill(0));
+const getEmptyGrid = (): CellState[][] => 
+  Array.from({ length: GRID_SIZE }, () => 
+    Array.from({ length: GRID_SIZE }, () => ({ color: 0, frozen: false, cracked: false, bomb: false }))
+  );
 
 const getRotations = (shape: number[][]) => {
   const rotations = [shape];
@@ -51,13 +61,15 @@ const getRotations = (shape: number[][]) => {
   return rotations;
 };
 
-export const useBlockBlast = () => {
-  const [grid, setGrid] = useState<number[][]>(getEmptyGrid());
+export const useBlockBlastSpecial = () => {
+  const [grid, setGrid] = useState<CellState[][]>(getEmptyGrid());
   const [hand, setHand] = useState(getRandomShapes());
   const [score, setScore] = useState(0);
   const [gameOver, setGameOver] = useState(false);
   const [holdShape, setHoldShape] = useState<any | null>(null);
   const [rerollsUsed, setRerollsUsed] = useState(0);
+  const [frozenDestroyed, setFrozenDestroyed] = useState(0);
+  const [bombsTriggered, setBombsTriggered] = useState(0);
 
   const checkPlacement = useCallback((shape: number[][], r: number, c: number) => {
     for (let i = 0; i < shape.length; i++) {
@@ -65,7 +77,7 @@ export const useBlockBlast = () => {
         if (shape[i][j]) {
           const rr = r + i;
           const cc = c + j;
-          if (rr < 0 || rr >= GRID_SIZE || cc < 0 || cc >= GRID_SIZE || grid[rr][cc] !== 0) {
+          if (rr < 0 || rr >= GRID_SIZE || cc < 0 || cc >= GRID_SIZE || grid[rr][cc].color !== 0) {
             return false;
           }
         }
@@ -74,7 +86,7 @@ export const useBlockBlast = () => {
     return true;
   }, [grid]);
 
-  const checkGameOver = useCallback((currentGrid: number[][], currentHand: any[], currentHold: any | null) => {
+  const checkGameOver = useCallback((currentGrid: CellState[][], currentHand: any[], currentHold: any | null) => {
     const availableShapes = currentHand.filter(s => !s.used);
     if (availableShapes.length === 0 && (!currentHold || currentHold.used)) return false;
 
@@ -90,7 +102,7 @@ export const useBlockBlast = () => {
                 if (shape[r][c]) {
                   const rr = i + r;
                   const cc = j + c;
-                  if (rr >= GRID_SIZE || cc >= GRID_SIZE || currentGrid[rr][cc] !== 0) {
+                  if (rr >= GRID_SIZE || cc >= GRID_SIZE || currentGrid[rr][cc].color !== 0) {
                     fits = false;
                     break;
                   }
@@ -116,7 +128,7 @@ export const useBlockBlast = () => {
                 if (shape[r][c]) {
                   const rr = i + r;
                   const cc = j + c;
-                  if (rr >= GRID_SIZE || cc >= GRID_SIZE || currentGrid[rr][cc] !== 0) {
+                  if (rr >= GRID_SIZE || cc >= GRID_SIZE || currentGrid[rr][cc].color !== 0) {
                     fits = false;
                     break;
                   }
@@ -142,14 +154,17 @@ export const useBlockBlast = () => {
     const shape = isHold ? holdShape.shape : hand[handIndex].shape;
     if (!checkPlacement(shape, r, c)) return false;
 
-    const newGrid = grid.map(row => [...row]);
+    const newGrid = grid.map(row => row.map(cell => ({ ...cell })));
     let blocksPlaced = 0;
     const colorIdx = isHold ? holdShape.colorIdx : hand[handIndex].colorIdx;
     const colorVal = (colorIdx !== undefined ? colorIdx : 0) + 1;
+    
     for (let i = 0; i < shape.length; i++) {
       for (let j = 0; j < shape[i].length; j++) {
         if (shape[i][j]) {
-          newGrid[r + i][c + j] = colorVal;
+          const isFrozen = Math.random() < 0.15;
+          const isBomb = !isFrozen && Math.random() < 0.10;
+          newGrid[r + i][c + j] = { color: colorVal, frozen: isFrozen, cracked: false, bomb: isBomb };
           blocksPlaced++;
         }
       }
@@ -159,12 +174,12 @@ export const useBlockBlast = () => {
     let colsToClear: number[] = [];
 
     for (let i = 0; i < GRID_SIZE; i++) {
-      if (newGrid[i].every(cell => cell !== 0)) rowsToClear.push(i);
+      if (newGrid[i].every(cell => cell.color !== 0)) rowsToClear.push(i);
     }
     for (let j = 0; j < GRID_SIZE; j++) {
       let colFull = true;
       for (let i = 0; i < GRID_SIZE; i++) {
-        if (newGrid[i][j] === 0) {
+        if (newGrid[i][j].color === 0) {
           colFull = false;
           break;
         }
@@ -173,18 +188,84 @@ export const useBlockBlast = () => {
     }
 
     const linesCleared = rowsToClear.length + colsToClear.length;
+    let localFrozenDestroyed = 0;
+    let localBombsTriggered = 0;
+    
+    const cellsToHit = new Set<string>();
+    
     rowsToClear.forEach(row => {
-      for (let j = 0; j < GRID_SIZE; j++) newGrid[row][j] = 0;
+      for (let j = 0; j < GRID_SIZE; j++) cellsToHit.add(`${row},${j}`);
     });
     colsToClear.forEach(col => {
-      for (let i = 0; i < GRID_SIZE; i++) newGrid[i][col] = 0;
+      for (let i = 0; i < GRID_SIZE; i++) cellsToHit.add(`${i},${col}`);
     });
+    
+    const processHits = (hits: Set<string>) => {
+      let newlyHit = false;
+      const arrayHits = Array.from(hits);
+      
+      for (const hitStr of arrayHits) {
+        const [row, col] = hitStr.split(',').map(Number);
+        const cell = newGrid[row][col];
+        if (cell.color !== 0) {
+          if (cell.bomb) {
+            localBombsTriggered++;
+            cell.color = 0; // Destroy bomb immediately
+            cell.bomb = false;
+            // Add adjacent cells to hits
+            for (let dr = -1; dr <= 1; dr++) {
+              for (let dc = -1; dc <= 1; dc++) {
+                const nr = row + dr;
+                const nc = col + dc;
+                if (nr >= 0 && nr < GRID_SIZE && nc >= 0 && nc < GRID_SIZE) {
+                  const nHitStr = `${nr},${nc}`;
+                  if (!hits.has(nHitStr) && newGrid[nr][nc].color !== 0) {
+                    hits.add(nHitStr);
+                    newlyHit = true;
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      
+      if (newlyHit) processHits(hits);
+    };
+    
+    if (cellsToHit.size > 0) {
+      processHits(cellsToHit);
+      
+      cellsToHit.forEach(hitStr => {
+        const [row, col] = hitStr.split(',').map(Number);
+        const cell = newGrid[row][col];
+        if (cell.color !== 0 && !cell.bomb) { // Bombs were already destroyed
+          if (cell.frozen) {
+            if (cell.cracked) {
+              cell.color = 0;
+              cell.frozen = false;
+              cell.cracked = false;
+              localFrozenDestroyed++;
+            } else {
+              cell.cracked = true;
+            }
+          } else {
+            cell.color = 0;
+          }
+        }
+      });
+    }
 
     const comboMultiplier = linesCleared > 1 ? linesCleared : 1;
-    const newScore = score + blocksPlaced + (linesCleared * 100 * comboMultiplier);
+    let newScore = score + blocksPlaced + (linesCleared * 100 * comboMultiplier);
+    newScore += localFrozenDestroyed * 50;
+    newScore += localBombsTriggered * 100;
     
     setScore(newScore);
     setGrid(newGrid);
+    
+    if (localFrozenDestroyed > 0) setFrozenDestroyed(prev => prev + localFrozenDestroyed);
+    if (localBombsTriggered > 0) setBombsTriggered(prev => prev + localBombsTriggered);
 
     let nextHoldShape = holdShape;
     if (isHold) {
@@ -207,7 +288,14 @@ export const useBlockBlast = () => {
       setGameOver(true);
     }
 
-    return { linesCleared, comboMultiplier, newScore, gameOver: checkGameOver(newGrid, finalHand, nextHoldShape) };
+    return { 
+      linesCleared, 
+      comboMultiplier, 
+      newScore, 
+      gameOver: checkGameOver(newGrid, finalHand, nextHoldShape),
+      frozenDestroyed: localFrozenDestroyed,
+      bombsTriggered: localBombsTriggered
+    };
   }, [grid, hand, score, gameOver, holdShape, checkPlacement, checkGameOver]);
 
   const rotateShape = useCallback((handIndex: number) => {
@@ -249,48 +337,42 @@ export const useBlockBlast = () => {
       }
     }
     
-    const newHold = {
+    setHoldShape({
       ...holdShape,
       shape: rotated
-    };
+    });
     
-    setHoldShape(newHold);
-    
-    if (checkGameOver(grid, hand, newHold)) {
+    if (checkGameOver(grid, hand, { ...holdShape, shape: rotated })) {
       setGameOver(true);
     }
-  }, [holdShape, grid, hand, gameOver, checkGameOver]);
+  }, [holdShape, gameOver, grid, hand, checkGameOver]);
 
   const holdCurrentShape = useCallback((handIndex: number) => {
     if (gameOver || hand[handIndex].used) return;
     const currentShape = hand[handIndex];
     
     const newHand = [...hand];
-    let newHold = null;
-    
-    if (holdShape) {
+    if (holdShape && !holdShape.used) {
       newHand[handIndex] = { ...holdShape, used: false };
-      newHold = { ...currentShape, used: false };
     } else {
-      newHand[handIndex] = { ...currentShape, used: true };
-      newHold = { ...currentShape, used: false };
+      newHand[handIndex].used = true;
     }
     
-    setHoldShape(newHold);
+    setHoldShape({ ...currentShape, used: false });
     
-    let finalHand = newHand;
     if (newHand.every(s => s.used)) {
-      finalHand = getRandomShapes();
+      setHand(getRandomShapes());
+    } else {
+      setHand(newHand);
     }
-    setHand(finalHand);
     
-    if (checkGameOver(grid, finalHand, newHold)) {
+    if (checkGameOver(grid, newHand.every(s => s.used) ? getRandomShapes() : newHand, currentShape)) {
       setGameOver(true);
     }
-  }, [hand, holdShape, grid, gameOver, checkGameOver]);
+  }, [hand, holdShape, gameOver, grid, checkGameOver]);
 
   const rerollHand = useCallback(() => {
-    if (gameOver) return;
+    if (gameOver) return false;
     const newHand = getRandomShapes();
     setHand(newHand);
     setRerollsUsed(prev => prev + 1);
@@ -298,21 +380,21 @@ export const useBlockBlast = () => {
     if (checkGameOver(grid, newHand, holdShape)) {
       setGameOver(true);
     }
-  }, [grid, holdShape, gameOver, checkGameOver]);
+    return true;
+  }, [gameOver, grid, holdShape, checkGameOver]);
 
   const destroyCell = useCallback((r: number, c: number) => {
-    if (r < 0 || r >= GRID_SIZE || c < 0 || c >= GRID_SIZE || grid[r][c] === 0) return false;
+    if (gameOver || r < 0 || r >= GRID_SIZE || c < 0 || c >= GRID_SIZE) return false;
     
-    const newGrid = grid.map(row => [...row]);
-    newGrid[r][c] = 0;
+    const newGrid = grid.map(row => row.map(cell => ({ ...cell })));
+    newGrid[r][c] = { color: 0, frozen: false, cracked: false, bomb: false };
+    
     setGrid(newGrid);
     
-    // Si c'était game over, on réévalue
-    if (gameOver) {
-      if (!checkGameOver(newGrid, hand, holdShape)) {
-        setGameOver(false);
-      }
+    if (checkGameOver(newGrid, hand, holdShape)) {
+      setGameOver(true);
     }
+    
     return true;
   }, [grid, gameOver, hand, holdShape, checkGameOver]);
 
@@ -323,6 +405,8 @@ export const useBlockBlast = () => {
     setGameOver(false);
     setHoldShape(null);
     setRerollsUsed(0);
+    setFrozenDestroyed(0);
+    setBombsTriggered(0);
   }, []);
 
   return {
@@ -330,15 +414,17 @@ export const useBlockBlast = () => {
     hand,
     score,
     gameOver,
-    placeShape,
-    reset,
-    checkPlacement,
-    rotateShape,
     holdShape,
-    holdCurrentShape,
-    rotateHoldShape,
-    rerollHand,
     rerollsUsed,
-    destroyCell
+    frozenDestroyed,
+    bombsTriggered,
+    placeShape,
+    rotateShape,
+    rotateHoldShape,
+    holdCurrentShape,
+    rerollHand,
+    destroyCell,
+    checkPlacement,
+    reset
   };
 };
