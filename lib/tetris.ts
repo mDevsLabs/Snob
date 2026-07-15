@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useMemo } from 'react';
 
 // Simplified Tetris-like hook for the Blitz/Campaign modes
 export type Grid = (number | string)[][];
@@ -240,17 +240,19 @@ export const useTetris = () => {
     return () => clearInterval(dropInterval);
   }, [isPlaying, moveDown, lines]);
 
-  // Helper to render the board easily
-  const displayGrid = grid.map(row => [...row]);
-  if (piece) {
-    piece.shape.forEach((row: number[], y: number) => {
-      row.forEach((val, x) => {
-        if (val && piece.y + y >= 0 && piece.y + y < ROWS) {
-          displayGrid[piece.y + y][piece.x + x] = piece.typeId;
-        }
+  const displayGrid = useMemo(() => {
+    const gridCopy = grid.map(row => [...row]);
+    if (piece) {
+      piece.shape.forEach((row: number[], y: number) => {
+        row.forEach((val, x) => {
+          if (val && piece.y + y >= 0 && piece.y + y < ROWS) {
+            gridCopy[piece.y + y][piece.x + x] = piece.typeId;
+          }
+        });
       });
-    });
-  }
+    }
+    return gridCopy;
+  }, [grid, piece]);
 
   return {
     grid: displayGrid,

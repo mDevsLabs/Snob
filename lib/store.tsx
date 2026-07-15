@@ -391,45 +391,43 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       parsed.lastDailyRewardClaim = null;
     }
 
-    setTimeout(() => {
-      setState({
-        ...parsed,
-        streak,
-        lastLoginDate: lastLogin,
-        streakBroken,
-        showLoginModal: showModal,
-        dailyQuests: dQuests,
-        weeklyQuests: wQuests,
-        gameHistory: history,
-        coins: parsed.coins || 0,
-        xp: parsed.xp || 0,
-        level: parsed.level || 1,
-        prestige: parsed.prestige || 0,
-        campaignStars: parsed.campaignStars || {},
-        soundEnabled: parsed.soundEnabled ?? true,
-        classicHighScore: parsed.classicHighScore || 0,
-        inventory: parsed.inventory || ["default_skin", "default_trail"],
-        equippedSkin: parsed.equippedSkin || "default_skin",
-        equippedTrail: parsed.equippedTrail || "default_trail",
-        equippedTheme: parsed.equippedTheme || "theme_classic",     // FIX
-        equippedAvatarFrame: parsed.equippedAvatarFrame || "frame_simple", // FIX
-        unlockedAchievements: parsed.unlockedAchievements || [],     // FIX
-        username: parsed.username || "Snob Anonyme",
-        bio: parsed.bio || "Je suis un snob mystérieux.",
-        avatar: parsed.avatar || "🎩",
-        snobPassUnlocked: parsed.snobPassUnlocked || false,
-        claimedSnobPassTiers: parsed.claimedSnobPassTiers || [],
-        dailyRewardClaimed: dailyRewardClaimed,
-        lastDailyRewardClaim: parsed.lastDailyRewardClaim || null,
-        reducedMotion: parsed.reducedMotion ?? false,
-        colorblindMode: parsed.colorblindMode ?? "none",
-        screenShake: parsed.screenShake ?? true,
-        particleDensity: parsed.particleDensity ?? "high",
-        gridContrast: parsed.gridContrast ?? "normal",
-        aimGuide: parsed.aimGuide ?? true,
-      });
-      setIsLoaded(true);
-    }, 0);
+    setState({
+      ...parsed,
+      streak,
+      lastLoginDate: lastLogin,
+      streakBroken,
+      showLoginModal: showModal,
+      dailyQuests: dQuests,
+      weeklyQuests: wQuests,
+      gameHistory: history,
+      coins: parsed.coins || 0,
+      xp: parsed.xp || 0,
+      level: parsed.level || 1,
+      prestige: parsed.prestige || 0,
+      campaignStars: parsed.campaignStars || {},
+      soundEnabled: parsed.soundEnabled ?? true,
+      classicHighScore: parsed.classicHighScore || 0,
+      inventory: parsed.inventory || ["default_skin", "default_trail"],
+      equippedSkin: parsed.equippedSkin || "default_skin",
+      equippedTrail: parsed.equippedTrail || "default_trail",
+      equippedTheme: parsed.equippedTheme || "theme_classic",
+      equippedAvatarFrame: parsed.equippedAvatarFrame || "frame_simple",
+      unlockedAchievements: parsed.unlockedAchievements || [],
+      username: parsed.username || "Snob Anonyme",
+      bio: parsed.bio || "Je suis un snob mystérieux.",
+      avatar: parsed.avatar || "🎩",
+      snobPassUnlocked: parsed.snobPassUnlocked || false,
+      claimedSnobPassTiers: parsed.claimedSnobPassTiers || [],
+      dailyRewardClaimed: dailyRewardClaimed,
+      lastDailyRewardClaim: parsed.lastDailyRewardClaim || null,
+      reducedMotion: parsed.reducedMotion ?? false,
+      colorblindMode: parsed.colorblindMode ?? "none",
+      screenShake: parsed.screenShake ?? true,
+      particleDensity: parsed.particleDensity ?? "high",
+      gridContrast: parsed.gridContrast ?? "normal",
+      aimGuide: parsed.aimGuide ?? true,
+    });
+    setIsLoaded(true);
   }, []);
 
   // Save to local storage
@@ -477,7 +475,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const addSp = (amount: number) => {
-    addCoins(amount);
+    setState((s) => ({ ...s, sp: (s.sp || 0) + amount }));
   };
 
   const addXp = (amount: number) => {
@@ -494,10 +492,10 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         newXp -= xpNeeded;
         newLevel++;
         xpNeeded = newLevel * 1000;
-        spGained += newLevel * 1000; // E.g. Level 2 gives 2000 SP, Level 3 gives 3000 SP, etc.
+        spGained += newLevel * 1000;
         leveledUp = true;
       }
-      if (newLevel === 100) newXp = 0; // Maxed
+      if (newLevel === 100) newXp = 0;
 
       const currentRewardGained = s.levelUpReward?.spGained || 0;
 
@@ -1138,7 +1136,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       value={{
         ...defaultState,
         ...state,
-        sp: state.coins || 0,
+        sp: state.sp || 0,
         addCoins,
         addSp,
         addXp,

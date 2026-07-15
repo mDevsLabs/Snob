@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useGameStore } from '@/lib/store';
 import { SKINS } from '@/lib/skins';
 import { THEMES } from '@/lib/themes';
@@ -313,7 +313,7 @@ export default function Inventory() {
       {activeTab === 'gadgets' && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {GADGETS.map((gadget, idx) => {
-            const count = inventory.filter(id => id === gadget.id).length;
+            const count = useMemo(() => inventory.filter(id => id === gadget.id).length, [inventory, gadget.id]);
 
             // Hide gadgets that are not owned yet
             if (count === 0) return null;

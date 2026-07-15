@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useGameStore, LootResult } from '@/lib/store';
 import { SKINS } from '@/lib/skins';
 import { THEMES } from '@/lib/themes';
@@ -102,6 +102,28 @@ export default function Store() {
     if (selectedRarity === 'All') return true;
     return g.rarity === selectedRarity;
   });
+
+  const rarityCounts = useMemo(() => {
+    const countOwned = (items: typeof SKINS | typeof TRAILS | typeof GADGETS, rarity: string) => items.filter(s => s.rarity === rarity && inventory.includes(s.id)).length;
+    
+    return {
+      skins: {
+        rare: { owned: countOwned(SKINS, 'Rare'), total: SKINS.filter(s => s.rarity === 'Rare').length },
+        epic: { owned: countOwned(SKINS, 'Épique'), total: SKINS.filter(s => s.rarity === 'Épique').length },
+        legendary: { owned: countOwned(SKINS, 'Légendaire'), total: SKINS.filter(s => s.rarity === 'Légendaire').length }
+      },
+      trails: {
+        rare: { owned: countOwned(TRAILS, 'Rare'), total: TRAILS.filter(t => t.rarity === 'Rare').length },
+        epic: { owned: countOwned(TRAILS, 'Épique'), total: TRAILS.filter(t => t.rarity === 'Épique').length },
+        legendary: { owned: countOwned(TRAILS, 'Légendaire'), total: TRAILS.filter(t => t.rarity === 'Légendaire').length }
+      },
+      gadgets: {
+        rare: { owned: countOwned(GADGETS, 'Rare'), total: GADGETS.filter(g => g.rarity === 'Rare').length },
+        epic: { owned: countOwned(GADGETS, 'Épique'), total: GADGETS.filter(g => g.rarity === 'Épique').length },
+        legendary: { owned: countOwned(GADGETS, 'Légendaire'), total: GADGETS.filter(g => g.rarity === 'Légendaire').length }
+      }
+    };
+  }, [inventory]);
 
   return (
     <div className="h-full flex flex-col p-6 lg:p-8 overflow-y-auto bg-slate-950">
@@ -244,43 +266,43 @@ export default function Store() {
           {activeTab === 'skins' ? (
             <>
               <div>
-                Rares : <span className="text-cyan-400 font-bold">{inventory.filter(id => SKINS.find(s => s.id === id)?.rarity === 'Rare').length} / {SKINS.filter(s => s.rarity === 'Rare').length}</span>
+                Rares : <span className="text-cyan-400 font-bold">{rarityCounts.skins.rare.owned} / {rarityCounts.skins.rare.total}</span>
               </div>
               <div className="hidden sm:block">|</div>
               <div>
-                Épiques : <span className="text-fuchsia-400 font-bold">{inventory.filter(id => SKINS.find(s => s.id === id)?.rarity === 'Épique').length} / {SKINS.filter(s => s.rarity === 'Épique').length}</span>
+                Épiques : <span className="text-fuchsia-400 font-bold">{rarityCounts.skins.epic.owned} / {rarityCounts.skins.epic.total}</span>
               </div>
               <div className="hidden sm:block">|</div>
               <div>
-                Légendaires : <span className="text-amber-400 font-bold">{inventory.filter(id => SKINS.find(s => s.id === id)?.rarity === 'Légendaire').length} / {SKINS.filter(s => s.rarity === 'Légendaire').length}</span>
+                Légendaires : <span className="text-amber-400 font-bold">{rarityCounts.skins.legendary.owned} / {rarityCounts.skins.legendary.total}</span>
               </div>
             </>
           ) : activeTab === 'trails' ? (
             <>
               <div>
-                Rares : <span className="text-cyan-400 font-bold">{inventory.filter(id => TRAILS.find(t => t.id === id)?.rarity === 'Rare').length} / {TRAILS.filter(t => t.rarity === 'Rare').length}</span>
+                Rares : <span className="text-cyan-400 font-bold">{rarityCounts.trails.rare.owned} / {rarityCounts.trails.rare.total}</span>
               </div>
               <div className="hidden sm:block">|</div>
               <div>
-                Épiques : <span className="text-fuchsia-400 font-bold">{inventory.filter(id => TRAILS.find(t => t.id === id)?.rarity === 'Épique').length} / {TRAILS.filter(t => t.rarity === 'Épique').length}</span>
+                Épiques : <span className="text-fuchsia-400 font-bold">{rarityCounts.trails.epic.owned} / {rarityCounts.trails.epic.total}</span>
               </div>
               <div className="hidden sm:block">|</div>
               <div>
-                Légendaires : <span className="text-amber-400 font-bold">{inventory.filter(id => TRAILS.find(t => t.id === id)?.rarity === 'Légendaire').length} / {TRAILS.filter(t => t.rarity === 'Légendaire').length}</span>
+                Légendaires : <span className="text-amber-400 font-bold">{rarityCounts.trails.legendary.owned} / {rarityCounts.trails.legendary.total}</span>
               </div>
             </>
           ) : (
             <>
               <div>
-                Rares : <span className="text-cyan-400 font-bold">{inventory.filter(id => GADGETS.find(g => g.id === id)?.rarity === 'Rare').length} / {GADGETS.filter(g => g.rarity === 'Rare').length}</span>
+                Rares : <span className="text-cyan-400 font-bold">{rarityCounts.gadgets.rare.owned} / {rarityCounts.gadgets.rare.total}</span>
               </div>
               <div className="hidden sm:block">|</div>
               <div>
-                Épiques : <span className="text-fuchsia-400 font-bold">{inventory.filter(id => GADGETS.find(g => g.id === id)?.rarity === 'Épique').length} / {GADGETS.filter(g => g.rarity === 'Épique').length}</span>
+                Épiques : <span className="text-fuchsia-400 font-bold">{rarityCounts.gadgets.epic.owned} / {rarityCounts.gadgets.epic.total}</span>
               </div>
               <div className="hidden sm:block">|</div>
               <div>
-                Légendaires : <span className="text-amber-400 font-bold">{inventory.filter(id => GADGETS.find(g => g.id === id)?.rarity === 'Légendaire').length} / {GADGETS.filter(g => g.rarity === 'Légendaire').length}</span>
+                Légendaires : <span className="text-amber-400 font-bold">{rarityCounts.gadgets.legendary.owned} / {rarityCounts.gadgets.legendary.total}</span>
               </div>
             </>
           )}

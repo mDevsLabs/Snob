@@ -5,7 +5,7 @@ export const auth = betterAuth({
   baseURL: process.env.NEXT_PUBLIC_APP_URL || process.env.APP_URL || "http://localhost:3000",
 
   // Secret pour signer les sessions
-  secret: process.env.BETTER_AUTH_SECRET || "snob-prestige-secret-change-in-production-2025",
+  secret: process.env.BETTER_AUTH_SECRET || (() => { throw new Error("BETTER_AUTH_SECRET environment variable is not set") })(),
 
   // Email & Password activé
   emailAndPassword: {

@@ -16,29 +16,27 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
-    setTimeout(() => {
-      setSp(parseInt(localStorage.getItem('snob_sp') || '100', 10));
-      setGems(parseInt(localStorage.getItem('snob_gems') || '50', 10));
-      setHighScore(parseInt(localStorage.getItem('snob_highScore') || '0', 10));
-      setXp(parseInt(localStorage.getItem('snob_xp') || '0', 10));
-      setEquippedSkin(localStorage.getItem('snob_skin') || 'default');
-      setGridShape((localStorage.getItem('snob_gridShape') as GridShape) || 'square');
-      
-      const savedInv = localStorage.getItem('snob_inventory');
-      if (savedInv) {
-        setInventory(JSON.parse(savedInv));
-      } else {
-        setInventory([
-          { id: '1', itemId: 'bomb', type: 'gadget', rarity: 'Common', name: 'Bomb', timestamp: Date.now() },
-          { id: '2', itemId: 'bomb', type: 'gadget', rarity: 'Common', name: 'Bomb', timestamp: Date.now() },
-          { id: '3', itemId: 'laser', type: 'gadget', rarity: 'Rare', name: 'Laser', timestamp: Date.now() },
-          { id: '4', itemId: 'reroll', type: 'gadget', rarity: 'Common', name: 'Reroll', timestamp: Date.now() },
-          { id: '5', itemId: 'hourglass', type: 'gadget', rarity: 'Epic', name: 'Hourglass', timestamp: Date.now() },
-          { id: '6', itemId: 'skin-liquid-ice', type: 'skin', rarity: 'Legendary', name: 'Liquid Ice', timestamp: Date.now() },
-        ]);
-      }
-      setLoaded(true);
-    }, 0);
+    setSp(parseInt(localStorage.getItem('snob_sp') || '100', 10));
+    setGems(parseInt(localStorage.getItem('snob_gems') || '50', 10));
+    setHighScore(parseInt(localStorage.getItem('snob_highScore') || '0', 10));
+    setXp(parseInt(localStorage.getItem('snob_xp') || '0', 10));
+    setEquippedSkin(localStorage.getItem('snob_skin') || 'default');
+    setGridShape((localStorage.getItem('snob_gridShape') as GridShape) || 'square');
+
+    const savedInv = localStorage.getItem('snob_inventory');
+    if (savedInv) {
+      setInventory(JSON.parse(savedInv));
+    } else {
+      setInventory([
+        { id: '1', itemId: 'bomb', type: 'gadget', rarity: 'Common', name: 'Bomb', timestamp: Date.now() },
+        { id: '2', itemId: 'bomb', type: 'gadget', rarity: 'Common', name: 'Bomb', timestamp: Date.now() },
+        { id: '3', itemId: 'laser', type: 'gadget', rarity: 'Rare', name: 'Laser', timestamp: Date.now() },
+        { id: '4', itemId: 'reroll', type: 'gadget', rarity: 'Common', name: 'Reroll', timestamp: Date.now() },
+        { id: '5', itemId: 'hourglass', type: 'gadget', rarity: 'Epic', name: 'Hourglass', timestamp: Date.now() },
+        { id: '6', itemId: 'skin-liquid-ice', type: 'skin', rarity: 'Legendary', name: 'Liquid Ice', timestamp: Date.now() },
+      ]);
+    }
+    setLoaded(true);
   }, []);
 
   useEffect(() => {

@@ -76,7 +76,7 @@ export const useBlockBlast = () => {
 
   const checkGameOver = useCallback((currentGrid: number[][], currentHand: any[], currentHold: any | null) => {
     const availableShapes = currentHand.filter(s => !s.used);
-    if (availableShapes.length === 0 && (!currentHold || currentHold.used)) return false;
+    if (availableShapes.length === 0 && (!currentHold || currentHold.used)) return true;
 
     // Check hand shapes in all possible rotations
     for (const s of availableShapes) {
